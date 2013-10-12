@@ -19,6 +19,10 @@ type taskFuncs struct {
 	Funcs      []taskFunc
 }
 
+func (t *taskFuncs) HasTasks() bool {
+	return len(t.Funcs) > 0
+}
+
 type taskFunc struct {
 	Name string
 }
@@ -33,12 +37,18 @@ func (l *taskLoader) Load() (funcs *taskFuncs, err error) {
 		return
 	}
 
-	p, err := build.ImportDir(dir, 0)
-	if err != nil {
-		return
+	p, e := build.ImportDir(dir, 0)
+	taskFiles := append(p.GoFiles, p.IgnoredGoFiles...)
+	taskFiles = append(taskFiles, p.CgoFiles...)
+	if e != nil {
+		// task files may be ignored for build
+		if _, ok := e.(*build.NoGoError); !ok || len(taskFiles) == 0 {
+			err = e
+			return
+		}
 	}
 
-	fs, err := loadTaskFuncs(dir, p.GoFiles)
+	fs, err := loadTaskFuncs(dir, taskFiles)
 	if err != nil {
 		return
 	}
