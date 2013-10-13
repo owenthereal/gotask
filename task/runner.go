@@ -38,7 +38,11 @@ func (r *Runner) Run() (err error) {
 	}()
 
 	file, err := writeTaskMain(work, funcs)
-	execCmd("go", "run", file)
+	if err != nil {
+		return
+	}
+
+	err = runTaskMain(file, r.Args)
 
 	return
 }
@@ -63,5 +67,12 @@ func writeTaskMain(work string, funcs *taskFuncs) (file string, err error) {
 	w := mainWriter{funcs}
 	err = w.Write(f)
 
+	return
+}
+
+func runTaskMain(file string, args []string) (err error) {
+	cmd := []string{"go", "run", file}
+	cmd = append(cmd, args...)
+	err = execCmd(cmd...)
 	return
 }

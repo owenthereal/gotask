@@ -2,15 +2,17 @@ package task
 
 import (
 	"fmt"
+	"os"
 )
 
 func RunTasks(tasks []Task) {
-	runner := taskRunner{Tasks: tasks}
+	runner := taskRunner{Tasks: tasks, Args: os.Args[1:]}
 	runner.Run()
 }
 
 type taskRunner struct {
 	Tasks []Task
+	Args  []string
 }
 
 func (r *taskRunner) Run() {
