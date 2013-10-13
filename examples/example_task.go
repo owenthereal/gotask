@@ -1,5 +1,3 @@
-// +build ignore
-
 package examples
 
 import (
@@ -8,6 +6,8 @@ import (
 )
 
 func TaskHelloWorld(t *task.T) {
-	t.Describe("Hello world").Name("hello")
-	fmt.Println("Hello world")
+	t.Name("say-hello").Describe("Say Hello")
+	t.Action(func() {
+		fmt.Println("Hello world")
+	})
 }

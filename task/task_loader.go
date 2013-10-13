@@ -64,7 +64,7 @@ func expandDir(dir string) (expanded string, err error) {
 		return
 	}
 
-	if !exists(dir) {
+	if !isFileExist(dir) {
 		err = fmt.Errorf("Directory %s does not exist", dir)
 		return
 	}
