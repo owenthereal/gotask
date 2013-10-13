@@ -17,14 +17,14 @@ func (r *Runner) Run() (err error) {
 		return
 	}
 
-	loader := taskLoader{source}
-	funcs, err := loader.Load()
+	loader := taskParser{source}
+	funcs, err := loader.Parse()
 	if err != nil {
 		return
 	}
 
 	if !funcs.HasTasks() {
-		err = fmt.Errorf("No task was found in %s", source)
+		err = fmt.Errorf("%s\t[no task files]", funcs.ImportPath)
 		return
 	}
 

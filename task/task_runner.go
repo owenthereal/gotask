@@ -4,20 +4,20 @@ import (
 	"fmt"
 )
 
-func RunTasks(funcs []func(*T)) {
-	runner := taskRunner{Funcs: funcs}
+func RunTasks(tasks []Task) {
+	runner := taskRunner{Tasks: tasks}
 	runner.Run()
 }
 
 type taskRunner struct {
-	Funcs []func(*T)
+	Tasks []Task
 }
 
 func (r *taskRunner) Run() {
 	var tasks []*T
-	for _, f := range r.Funcs {
-		t := &T{}
-		f(t)
+	for _, task := range r.Tasks {
+		t := &T{name: task.Name}
+		task.F(t)
 		tasks = append(tasks, t)
 	}
 

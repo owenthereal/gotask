@@ -27,11 +27,15 @@ type taskFunc struct {
 	Name string
 }
 
-type taskLoader struct {
+func (t *taskFunc) TaskName() string {
+	return strings.TrimPrefix(t.Name, "Task")
+}
+
+type taskParser struct {
 	Dir string
 }
 
-func (l *taskLoader) Load() (funcs *taskFuncs, err error) {
+func (l *taskParser) Parse() (funcs *taskFuncs, err error) {
 	dir, err := expandDir(l.Dir)
 	if err != nil {
 		return

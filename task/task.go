@@ -1,18 +1,23 @@
 package task
 
-type T struct {
-	desc   string
-	name   string
-	action func()
+type Task struct {
+	Name string
+	F    func(*T)
 }
 
-func (t *T) Describe(desc string) *T {
-	t.desc = desc
-	return t
+type T struct {
+	name   string
+	desc   string
+	action func()
 }
 
 func (t *T) Name(name string) *T {
 	t.name = name
+	return t
+}
+
+func (t *T) Describe(desc string) *T {
+	t.desc = desc
 	return t
 }
 

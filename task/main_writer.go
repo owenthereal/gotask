@@ -24,13 +24,13 @@ import (
 {{end}}
 )
 
-var taskFuncs = []func(*task.T){
+var tasks = []task.Task{
 {{range .Funcs}}
-	_task.{{.Name}},
+  {"{{.TaskName}}", _task.{{.Name}}},
 {{end}}
 }
 
 func main() {
-	task.RunTasks(taskFuncs)
+	task.RunTasks(tasks)
 }
 `))

@@ -18,5 +18,5 @@ func TestMainWriter_Write(t *testing.T) {
 	b.Write(&out)
 
 	assert.T(t, strings.Contains(out.String(), `_task "github.com/jingweno/gotask/examples"`))
-	assert.T(t, strings.Contains(out.String(), "_task.TaskHelloWorld"))
+	assert.T(t, strings.Contains(out.String(), `{"TaskHelloWorld", _task.TaskHelloWorld}`))
 }
