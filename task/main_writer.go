@@ -18,9 +18,10 @@ var taskmainTmpl = template.Must(template.New("main").Parse(`
 package main
 
 import (
-	"github.com/jingweno/gotask/task"
+  "os"
+  "github.com/jingweno/gotask/task"
 {{if .HasTasks}}
-	_task "{{.ImportPath}}"
+  _task "{{.ImportPath}}"
 {{end}}
 )
 
@@ -31,6 +32,7 @@ var tasks = []task.Task{
 }
 
 func main() {
-	task.RunTasks(tasks)
+  result := task.RunTasks(tasks)
+  os.Exit(result.ExitCode)
 }
 `))

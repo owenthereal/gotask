@@ -7,13 +7,9 @@ import (
 )
 
 func main() {
-	runner := task.Runner{Args: os.Args[1:]}
-	err := runner.Run()
-	exitCode := 0
-	if err != nil {
-		fmt.Println(err)
-		exitCode = 1
+	result := task.Run(os.Args[1:])
+	if result.HasError() {
+		fmt.Fprintln(os.Stderr, result)
 	}
-
-	os.Exit(exitCode)
+	os.Exit(result.ExitCode)
 }
