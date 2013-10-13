@@ -5,6 +5,9 @@ import (
 	"github.com/jingweno/gotask/task"
 )
 
+// Say hello world
+//
+// Print out hello world
 func TaskHelloWorld(t *task.T) {
 	t.Name("say-hello").Describe("Say Hello")
 	t.Action(func() {

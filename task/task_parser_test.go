@@ -22,9 +22,25 @@ func TestTaskParser_filterTaskFiles(t *testing.T) {
 	assert.Equal(t, "file_task.go", taskFiles[0])
 }
 
-func TestTaskParser_parseTaskNames(t *testing.T) {
-	names, _ := parseTaskNames("../examples/example_task.go")
+func TestTaskParser_parseTaskFuncs(t *testing.T) {
+	funcs, _ := parseTaskFuncs("../examples/example_task.go")
 
-	assert.Equal(t, 1, len(names))
-	assert.Equal(t, "TaskHelloWorld", names[0])
+	assert.Equal(t, 1, len(funcs))
+	assert.Equal(t, "TaskHelloWorld", funcs[0].Name)
+	assert.Equal(t, "Say hello world", funcs[0].Usage)
+	assert.Equal(t, "Print out hello world", funcs[0].Description)
+}
+
+func TestParseUsageAndDesc(t *testing.T) {
+	doc := `Usage
+
+Desc
+
+Desc2
+`
+	usage, desc, err := parseUsageAndDesc(doc)
+
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "Usage", usage)
+	assert.Equal(t, "Desc\n\nDesc2", desc)
 }

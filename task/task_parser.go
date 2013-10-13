@@ -1,12 +1,16 @@
 package task
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"go/ast"
 	"go/build"
 	"go/parser"
 	"go/token"
+	"io"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -24,7 +28,9 @@ func (t *taskFuncs) HasTasks() bool {
 }
 
 type taskFunc struct {
-	Name string
+	Name        string
+	Usage       string
+	Description string
 }
 
 func (t *taskFunc) TaskName() string {
@@ -79,15 +85,13 @@ func expandDir(dir string) (expanded string, err error) {
 func loadTaskFuncs(dir string, files []string) (taskFuncs []taskFunc, err error) {
 	taskFiles := filterTaskFiles(files)
 	for _, taskFile := range taskFiles {
-		names, e := parseTaskNames(filepath.Join(dir, taskFile))
+		funcs, e := parseTaskFuncs(filepath.Join(dir, taskFile))
 		if e != nil {
 			err = e
 			return
 		}
 
-		for _, name := range names {
-			taskFuncs = append(taskFuncs, taskFunc{Name: name})
-		}
+		taskFuncs = append(taskFuncs, funcs...)
 	}
 
 	return
@@ -103,8 +107,8 @@ func filterTaskFiles(files []string) (taskFiles []string) {
 	return
 }
 
-func parseTaskNames(filename string) (names []string, err error) {
-	f, err := parser.ParseFile(taskFileSet, filename, nil, 0)
+func parseTaskFuncs(filename string) (funcs []taskFunc, err error) {
+	f, err := parser.ParseFile(taskFileSet, filename, nil, parser.ParseComments)
 	if err != nil {
 		return
 	}
@@ -121,7 +125,13 @@ func parseTaskNames(filename string) (names []string, err error) {
 
 		name := n.Name.String()
 		if isTask(name, "Task") {
-			names = append(names, name)
+			usage, desc, e := parseUsageAndDesc(n.Doc.Text())
+			if e != nil {
+				continue
+			}
+
+			f := taskFunc{Name: name, Usage: usage, Description: desc}
+			funcs = append(funcs, f)
 		}
 	}
 
@@ -146,4 +156,48 @@ func isTask(name, prefix string) bool {
 
 	rune, _ := utf8.DecodeRuneInString(name[len(prefix):])
 	return !unicode.IsLower(rune)
+}
+
+func parseUsageAndDesc(doc string) (usage, desc string, err error) {
+	reader := bufio.NewReader(bytes.NewReader([]byte(doc)))
+	r := regexp.MustCompile("\\S")
+	var usageParts, descParts []string
+
+	line, err := readLine(reader)
+	for err == nil {
+		if len(descParts) == 0 && r.MatchString(line) {
+			usageParts = append(usageParts, line)
+		} else {
+			descParts = append(descParts, line)
+		}
+
+		line, err = readLine(reader)
+	}
+
+	if err == io.EOF {
+		err = nil
+	}
+
+	usage = strings.Join(usageParts, " ")
+	usage = strings.TrimSpace(usage)
+
+	desc = strings.Join(descParts, "\n")
+	desc = strings.TrimSpace(desc)
+
+	return
+}
+
+func readLine(r *bufio.Reader) (string, error) {
+	var (
+		isPrefix = true
+		err      error
+		line, ln []byte
+	)
+
+	for isPrefix && err == nil {
+		line, isPrefix, err = r.ReadLine()
+		ln = append(ln, line...)
+	}
+
+	return string(ln), err
 }
