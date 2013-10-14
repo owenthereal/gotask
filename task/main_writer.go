@@ -6,11 +6,11 @@ import (
 )
 
 type mainWriter struct {
-	Funcs *taskFuncs
+	TaskSet *TaskSet
 }
 
-func (b *mainWriter) Write(wr io.Writer) (err error) {
-	err = taskmainTmpl.Execute(wr, b.Funcs)
+func (w *mainWriter) Write(wr io.Writer) (err error) {
+	err = taskmainTmpl.Execute(wr, w.TaskSet)
 	return
 }
 
@@ -26,8 +26,8 @@ import (
 )
 
 var tasks = []task.Task{
-{{range .Funcs}}
-  {"{{.TaskName}}", {{.Usage | printf "%q"}}, {{.Description | printf "%q"}}, _task.{{.Name}}},
+{{range .Tasks}}
+  {"{{.Name}}", {{.Usage | printf "%q"}}, {{.Description | printf "%q"}}, _task.{{.ActionName}}},
 {{end}}
 }
 

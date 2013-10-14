@@ -26,15 +26,17 @@ func (r *Runner) Run() (err error) {
 	}
 
 	loader := taskParser{source}
-	funcs, err := loader.Parse()
+	taskSet, err := loader.Parse()
 	if err != nil {
 		return
 	}
 
-	if !funcs.HasTasks() {
-		err = fmt.Errorf("%s\t[no task files]", funcs.ImportPath)
+	if !taskSet.HasTasks() {
+		err = fmt.Errorf("%s\t[no task files]", taskSet.ImportPath)
 		return
 	}
+
+	// TODO: skip compilation if it's just listing tasks or getting help
 
 	// create temp work dir
 	work, err := ioutil.TempDir("", "go-task")
@@ -45,7 +47,7 @@ func (r *Runner) Run() (err error) {
 		os.RemoveAll(work)
 	}()
 
-	file, err := writeTaskMain(work, funcs)
+	file, err := writeTaskMain(work, taskSet)
 	if err != nil {
 		return
 	}
@@ -59,9 +61,9 @@ func (r *Runner) Run() (err error) {
 	return
 }
 
-func writeTaskMain(work string, funcs *taskFuncs) (file string, err error) {
+func writeTaskMain(work string, taskSet *TaskSet) (file string, err error) {
 	// create task dir
-	taskDir := filepath.Join(work, filepath.FromSlash(funcs.ImportPath))
+	taskDir := filepath.Join(work, filepath.FromSlash(taskSet.ImportPath))
 	err = os.MkdirAll(taskDir, 0777)
 	if err != nil {
 		return
@@ -76,7 +78,7 @@ func writeTaskMain(work string, funcs *taskFuncs) (file string, err error) {
 	defer f.Close()
 
 	// write to main.go
-	w := mainWriter{funcs}
+	w := mainWriter{taskSet}
 	err = w.Write(f)
 
 	return

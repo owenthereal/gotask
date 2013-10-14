@@ -18,31 +18,11 @@ import (
 
 var taskFileSet = token.NewFileSet()
 
-type taskFuncs struct {
-	ImportPath string
-	Funcs      []taskFunc
-}
-
-func (t *taskFuncs) HasTasks() bool {
-	return len(t.Funcs) > 0
-}
-
-type taskFunc struct {
-	Name        string
-	Usage       string
-	Description string
-}
-
-func (t *taskFunc) TaskName() string {
-	n := strings.TrimPrefix(t.Name, "Task")
-	return dasherize(n)
-}
-
 type taskParser struct {
 	Dir string
 }
 
-func (l *taskParser) Parse() (funcs *taskFuncs, err error) {
+func (l *taskParser) Parse() (taskSet *TaskSet, err error) {
 	dir, err := expandDir(l.Dir)
 	if err != nil {
 		return
@@ -59,12 +39,12 @@ func (l *taskParser) Parse() (funcs *taskFuncs, err error) {
 		}
 	}
 
-	fs, err := loadTaskFuncs(dir, taskFiles)
+	tasks, err := loadTasks(dir, taskFiles)
 	if err != nil {
 		return
 	}
 
-	funcs = &taskFuncs{ImportPath: p.ImportPath, Funcs: fs}
+	taskSet = &TaskSet{ImportPath: p.ImportPath, Tasks: tasks}
 
 	return
 }
@@ -83,16 +63,16 @@ func expandDir(dir string) (expanded string, err error) {
 	return
 }
 
-func loadTaskFuncs(dir string, files []string) (taskFuncs []taskFunc, err error) {
+func loadTasks(dir string, files []string) (tasks []Task, err error) {
 	taskFiles := filterTaskFiles(files)
 	for _, taskFile := range taskFiles {
-		funcs, e := parseTaskFuncs(filepath.Join(dir, taskFile))
+		ts, e := parseTasks(filepath.Join(dir, taskFile))
 		if e != nil {
 			err = e
 			return
 		}
 
-		taskFuncs = append(taskFuncs, funcs...)
+		tasks = append(tasks, ts...)
 	}
 
 	return
@@ -108,7 +88,7 @@ func filterTaskFiles(files []string) (taskFiles []string) {
 	return
 }
 
-func parseTaskFuncs(filename string) (funcs []taskFunc, err error) {
+func parseTasks(filename string) (tasks []Task, err error) {
 	f, err := parser.ParseFile(taskFileSet, filename, nil, parser.ParseComments)
 	if err != nil {
 		return
@@ -124,15 +104,16 @@ func parseTaskFuncs(filename string) (funcs []taskFunc, err error) {
 			continue
 		}
 
-		name := n.Name.String()
-		if isTask(name, "Task") {
+		actionName := n.Name.String()
+		if isTask(actionName, "Task") {
 			usage, desc, e := parseUsageAndDesc(n.Doc.Text())
 			if e != nil {
 				continue
 			}
 
-			f := taskFunc{Name: name, Usage: usage, Description: desc}
-			funcs = append(funcs, f)
+			name := convertActionNameToTaskName(actionName)
+			t := Task{Name: name, ActionName: actionName, Usage: usage, Description: desc}
+			tasks = append(tasks, t)
 		}
 	}
 
@@ -157,6 +138,11 @@ func isTask(name, prefix string) bool {
 
 	rune, _ := utf8.DecodeRuneInString(name[len(prefix):])
 	return !unicode.IsLower(rune)
+}
+
+func convertActionNameToTaskName(s string) string {
+	n := strings.TrimPrefix(s, "Task")
+	return dasherize(n)
 }
 
 func parseUsageAndDesc(doc string) (usage, desc string, err error) {

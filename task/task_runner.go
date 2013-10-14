@@ -45,7 +45,7 @@ func execTask(tasks []Task, name string, args []string) (err error) {
 	for _, task := range tasks {
 		if name == task.Name {
 			t := &T{Args: args}
-			task.F(t)
+			task.Action(t)
 			var writer io.Writer
 			if t.failed {
 				writer = os.Stderr

@@ -7,11 +7,11 @@ import (
 
 func TestTaskParser_Load(t *testing.T) {
 	l := taskParser{"../examples"}
-	funcs, err := l.Parse()
+	ts, err := l.Parse()
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, "github.com/jingweno/gotask/examples", funcs.ImportPath)
-	assert.Equal(t, 1, len(funcs.Funcs))
+	assert.Equal(t, "github.com/jingweno/gotask/examples", ts.ImportPath)
+	assert.Equal(t, 2, len(ts.Tasks))
 }
 
 func TestTaskParser_filterTaskFiles(t *testing.T) {
@@ -22,13 +22,14 @@ func TestTaskParser_filterTaskFiles(t *testing.T) {
 	assert.Equal(t, "file_task.go", taskFiles[0])
 }
 
-func TestTaskParser_parseTaskFuncs(t *testing.T) {
-	funcs, _ := parseTaskFuncs("../examples/example_task.go")
+func TestTaskParser_parseTasks(t *testing.T) {
+	tasks, _ := parseTasks("../examples/say_hello_task.go")
 
-	assert.Equal(t, 1, len(funcs))
-	assert.Equal(t, "TaskHelloWorld", funcs[0].Name)
-	assert.Equal(t, "Say hello world", funcs[0].Usage)
-	assert.Equal(t, "Print out hello world", funcs[0].Description)
+	assert.Equal(t, 1, len(tasks))
+	assert.Equal(t, "say-hello", tasks[0].Name)
+	assert.Equal(t, "TaskSayHello", tasks[0].ActionName)
+	assert.Equal(t, "Say hello to current user", tasks[0].Usage)
+	assert.Equal(t, "Print out hello to current user", tasks[0].Description)
 }
 
 func TestParseUsageAndDesc(t *testing.T) {
