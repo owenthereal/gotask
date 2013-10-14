@@ -83,7 +83,7 @@ func compileTaskMain(sourceDir, mainFile string) (exec string, err error) {
 	return
 }
 
-func compileAndRun(args []string) {
+func compileAndRun(args []string) (err error) {
 	source, err := os.Getwd()
 	if err != nil {
 		return

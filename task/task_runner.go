@@ -7,24 +7,21 @@ import (
 	"os"
 )
 
-func RunTasks(tasks []Task) {
-	runner := taskRunner{Tasks: tasks, Args: os.Args[1:]}
-	runner.Run()
+func RunTaskSet(taskSet *TaskSet, args []string) {
+	runner := taskRunner{TaskSet: taskSet}
+	runner.Run(args)
 }
 
 type taskRunner struct {
-	Tasks []Task
-	Args  []string
+	TaskSet *TaskSet
 }
 
-func (r *taskRunner) Run() {
-	cmds := convertToCommands(r.Tasks)
+func (r *taskRunner) Run(args []string) {
+	cmds := convertToCommands(r.TaskSet.Tasks)
 	app := cli.NewApp()
-	app.Name = "gotask"
-	app.Usage = "Build tool in Go"
-	app.Version = "0.0.1"
+	app.Name = r.TaskSet.Name
 	app.Commands = cmds
-	app.Run(r.Args)
+	app.Run(args)
 	return
 }
 

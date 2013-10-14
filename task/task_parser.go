@@ -44,7 +44,7 @@ func (l *taskParser) Parse() (taskSet *TaskSet, err error) {
 		return
 	}
 
-	taskSet = &TaskSet{Dir: p.Dir, ImportPath: p.ImportPath, Tasks: tasks}
+	taskSet = &TaskSet{Name: p.Name, Dir: p.Dir, ImportPath: p.ImportPath, Tasks: tasks}
 
 	return
 }

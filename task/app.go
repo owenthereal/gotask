@@ -65,7 +65,10 @@ func parseCommands() (cmds []cli.Command, err error) {
 			Action: func(c *cli.Context) {
 				a := []string{t.Name}
 				a = append(a, c.Args()...)
-				compileAndRun(a)
+				err := compileAndRun(a)
+				if err != nil {
+					log.Fatal(err)
+				}
 			},
 		}
 		cmds = append(cmds, cmd)

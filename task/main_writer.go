@@ -18,6 +18,7 @@ var taskmainTmpl = template.Must(template.New("main").Parse(`
 package main
 
 import (
+  "os"
   "github.com/jingweno/gotask/task"
 {{if .HasTasks}}
   _task "{{.ImportPath}}"
@@ -30,7 +31,14 @@ var tasks = []task.Task{
 {{end}}
 }
 
+var taskSet = task.TaskSet{
+  Name: "{{.Name}}",
+  Dir: "{{.Dir}}",
+  ImportPath: "{{.ImportPath}}",
+  Tasks: tasks,
+}
+
 func main() {
-  task.RunTasks(tasks)
+  task.RunTaskSet(&taskSet, os.Args)
 }
 `))

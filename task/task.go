@@ -5,6 +5,7 @@ import (
 )
 
 type TaskSet struct {
+	Name       string
 	Dir        string
 	ImportPath string
 	Tasks      []Task
