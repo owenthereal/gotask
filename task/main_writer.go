@@ -27,7 +27,7 @@ import (
 
 var tasks = []task.Task{
 {{range .Funcs}}
-  {"{{.TaskName}}", _task.{{.Name}}},
+  {"{{.TaskName}}", "{{.Usage}}", "{{.Description}}", _task.{{.Name}}},
 {{end}}
 }
 

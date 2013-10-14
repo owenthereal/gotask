@@ -16,45 +16,43 @@ type taskRunner struct {
 }
 
 func (r *taskRunner) Run() (result *Result) {
-	var tasks []*T
-	for _, task := range r.Tasks {
-		t := &T{name: task.Name}
-		task.F(t)
-		tasks = append(tasks, t)
-	}
-
 	if len(r.Args) == 0 {
-		printUsage(tasks)
+		printUsage(r.Tasks)
 		result = newResult(nil)
 		return
 	}
 
-	e := execTask(tasks, r.Args[0], r.Args[1:])
-	result = newResult(e)
-
-	if e == nil {
-	} else {
-		fmt.Fprintln(os.Stderr, e)
-		printUsage(tasks)
+	name := r.Args[0]
+	args := r.Args[1:]
+	err := execTask(r.Tasks, name, args)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		printUsage(r.Tasks)
 	}
 
+	result = newResult(err)
 	return
 }
 
-func printUsage(tasks []*T) {
+func printUsage(tasks []Task) {
 	for _, task := range tasks {
-		fmt.Println(task.name)
+		fmt.Printf("%s\t%s\n", task.Name, task.Usage)
 	}
 }
 
-func execTask(tasks []*T, taskName string, args []string) (err error) {
+func execTask(tasks []Task, name string, args []string) (err error) {
 	for _, task := range tasks {
-		if task.name == taskName {
-			task.action()
+		if name == task.Name {
+			t := &T{}
+			task.F(t)
+			if t.Err != "" {
+				fmt.Fprintln(os.Stderr, t.Err)
+			}
+
 			return
 		}
 	}
 
-	err = fmt.Errorf("'%s' is not a task", taskName)
+	err = fmt.Errorf("'%s' is not a task", name)
 	return
 }

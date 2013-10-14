@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
+	"strings"
 )
 
 func isFileExist(name string) bool {
@@ -27,4 +29,17 @@ func execCmd(cmd ...string) error {
 	c.Stderr = os.Stderr
 
 	return c.Run()
+}
+
+func dasherize(s string) string {
+	r := regexp.MustCompile("([A-Z\\d]+)([A-Z][a-z])")
+	s = r.ReplaceAllString(s, "$1-$2")
+
+	r = regexp.MustCompile("([a-z\\d])([A-Z])")
+	s = r.ReplaceAllString(s, "$1-$2")
+
+	s = strings.Replace(s, "_", "-", -1)
+	s = strings.ToLower(s)
+
+	return s
 }

@@ -34,7 +34,8 @@ type taskFunc struct {
 }
 
 func (t *taskFunc) TaskName() string {
-	return strings.TrimPrefix(t.Name, "Task")
+	n := strings.TrimPrefix(t.Name, "Task")
+	return dasherize(n)
 }
 
 type taskParser struct {
