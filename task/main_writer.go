@@ -27,7 +27,7 @@ import (
 
 var tasks = []task.Task{
 {{range .Tasks}}
-  {"{{.Name}}", {{.Usage | printf "%q"}}, {{.Description | printf "%q"}}, _task.{{.ActionName}}},
+  {Name: "{{.Name}}", Usage: {{.Usage | printf "%q"}}, Description: {{.Description | printf "%q"}}, Action: _task.{{.ActionName}}},
 {{end}}
 }
 

@@ -18,5 +18,5 @@ func TestMainWriter_Write(t *testing.T) {
 	b.Write(&out)
 
 	assert.Tf(t, strings.Contains(out.String(), `_task "github.com/jingweno/gotask/examples"`), "%v", out.String())
-	assert.Tf(t, strings.Contains(out.String(), `{"HelloWorld", "Say Hello world", "Print out Hello World", _task.TaskHelloWorld}`), "%v", out.String())
+	assert.Tf(t, strings.Contains(out.String(), `{Name: "HelloWorld", Usage: "Say Hello world", Description: "Print out Hello World", Action: _task.TaskHelloWorld}`), "%v", out.String())
 }
