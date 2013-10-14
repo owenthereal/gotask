@@ -2,13 +2,14 @@ package task
 
 import (
 	"fmt"
+	"github.com/codegangsta/cli"
 	"io"
 	"os"
 )
 
-func RunTasks(tasks []Task) *Result {
+func RunTasks(tasks []Task) {
 	runner := taskRunner{Tasks: tasks, Args: os.Args[1:]}
-	return runner.Run()
+	runner.Run()
 }
 
 type taskRunner struct {
@@ -16,51 +17,46 @@ type taskRunner struct {
 	Args  []string
 }
 
-func (r *taskRunner) Run() (result *Result) {
-	if len(r.Args) == 0 {
-		printUsage(r.Tasks)
-		result = newResult(nil)
-		return
-	}
-
-	name := r.Args[0]
-	args := r.Args[1:]
-	err := execTask(r.Tasks, name, args)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		printUsage(r.Tasks)
-	}
-
-	result = newResult(err)
+func (r *taskRunner) Run() {
+	cmds := convertToCommands(r.Tasks)
+	app := cli.NewApp()
+	app.Name = "gotask"
+	app.Usage = "Build tool in Go"
+	app.Version = "0.0.1"
+	app.Commands = cmds
+	app.Run(r.Args)
 	return
 }
 
-func printUsage(tasks []Task) {
+func convertToCommands(tasks []Task) (cmds []cli.Command) {
 	for _, task := range tasks {
-		fmt.Printf("%s\t%s\n", task.Name, task.Usage)
-	}
-}
-
-func execTask(tasks []Task, name string, args []string) (err error) {
-	for _, task := range tasks {
-		if name == task.Name {
-			t := &T{Args: args}
-			task.Action(t)
-			var writer io.Writer
-			if t.failed {
-				writer = os.Stderr
-			} else {
-				writer = os.Stdout
-			}
-
-			for _, out := range t.output {
-				fmt.Fprintf(writer, "%v", out)
-			}
-
-			return
+		t := task
+		cmd := cli.Command{
+			Name:        task.Name,
+			Usage:       task.Usage,
+			Description: task.Description,
+			Action: func(c *cli.Context) {
+				runTask(t, c.Args())
+			},
 		}
+
+		cmds = append(cmds, cmd)
 	}
 
-	err = fmt.Errorf("'%s' is not a task", name)
 	return
+}
+
+func runTask(task Task, args []string) {
+	t := &T{Args: args}
+	task.Action(t)
+	var writer io.Writer
+	if t.failed {
+		writer = os.Stderr
+	} else {
+		writer = os.Stdout
+	}
+
+	for _, out := range t.output {
+		fmt.Fprintf(writer, "%v", out)
+	}
 }

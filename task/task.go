@@ -5,6 +5,7 @@ import (
 )
 
 type TaskSet struct {
+	Dir        string
 	ImportPath string
 	Tasks      []Task
 }
@@ -19,6 +20,10 @@ type Task struct {
 	Description string
 	ActionName  string
 	Action      func(*T)
+}
+
+func (t *Task) PrintHelp() {
+	fmt.Println(t.Description)
 }
 
 type T struct {

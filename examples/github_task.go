@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-// Get the user page URL of a given GitHub user login
+// Get URL for a given GitHub user login
 //
 // Given a GitHub user login, call the GitHub API
 // to get this user and print out the user page URL.
@@ -28,7 +28,13 @@ func TaskGitHubUser(t *task.T) {
 		return
 	}
 
-	t.Logf("The URL for user %s is %s\n", login, data["html_url"])
+	url, ok := data["html_url"]
+	if !ok {
+		t.Errorf("No URL found for user login %s\n", login)
+		return
+	}
+
+	t.Logf("The URL for user %s is %s\n", login, url)
 }
 
 func getGitHubUser(login string) (data map[string]interface{}, err error) {
