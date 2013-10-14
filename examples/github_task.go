@@ -1,0 +1,46 @@
+package examples
+
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/jingweno/gotask/task"
+	"io/ioutil"
+	"net/http"
+)
+
+// Get the user page URL of a given GitHub user login
+//
+// Given a GitHub user login, call the GitHub API
+// to get this user and print out the user page URL.
+// For example
+//
+// $ gotask git-hub-user jingweno
+func TaskGitHubUser(t *task.T) {
+	if len(t.Args) == 0 {
+		t.Error("No GitHub user login is provided!")
+		return
+	}
+
+	login := t.Args[0]
+	data, err := getGitHubUser(login)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Logf("The URL for user %s is %s\n", login, data["html_url"])
+}
+
+func getGitHubUser(login string) (data map[string]interface{}, err error) {
+	url := fmt.Sprintf("https://api.github.com/users/%s", login)
+	res, err := http.Get(url)
+	if err != nil {
+		return
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	err = json.Unmarshal(body, &data)
+	return
+}

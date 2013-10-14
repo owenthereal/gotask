@@ -2,6 +2,7 @@ package task
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -43,10 +44,17 @@ func printUsage(tasks []Task) {
 func execTask(tasks []Task, name string, args []string) (err error) {
 	for _, task := range tasks {
 		if name == task.Name {
-			t := &T{}
+			t := &T{Args: args}
 			task.F(t)
-			if t.Err != "" {
-				fmt.Fprintln(os.Stderr, t.Err)
+			var writer io.Writer
+			if t.failed {
+				writer = os.Stderr
+			} else {
+				writer = os.Stdout
+			}
+
+			for _, out := range t.output {
+				fmt.Fprintf(writer, "%v", out)
 			}
 
 			return
