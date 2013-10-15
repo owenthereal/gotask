@@ -10,7 +10,7 @@ It provides a convention-over-configuration way of writing build tasks in Go.
 
 ## Defining a Task
 
-Similar to defining a Go test, create a file name `TASK_NAME_task.go` and name the task function in the
+Similar to defining a Go test, create a file called `TASK_NAME_task.go` and name the task function in the
 format of
 
 ```go
@@ -25,6 +25,12 @@ func TaskXxx(*task.T) {
 where `Xxx` can be any alphanumeric string (but the first letter must not be in [a-z]) and serves to identify the task routine.
 The comments for the task function will be automatically parsed as the task's usage and help description:
 The first block of the comment is the usage and the rest is the description.
+
+## Compiling tasks
+
+`gotask` is able to compile defined tasks into a binary using `go build`.
+This is useful when you need to distribute your build executables.
+See `gotask -c` for details.
 
 ## Installation
 
@@ -99,6 +105,12 @@ To execute the task, type:
 ```plain
 $ gotask say-hello
 Hello Owen Ou
+```
+
+To compile the task into binary using `go build`, type:
+
+```plain
+$ gotask -c
 ```
 
 More [examples](https://github.com/jingweno/gotask/tree/master/examples) are available.
