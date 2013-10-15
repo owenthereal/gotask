@@ -1,6 +1,6 @@
 # gotask
 
-Build tool in Go.
+A convention-over-configuration build tool in Go.
 
 ## Overview
 
@@ -10,21 +10,21 @@ It provides a convention-over-configuration way of writing build tasks in Go.
 
 ## Defining a Task
 
-Similar to writing a Go test, create a file name `TASK_NAME_task.go` and name the task function in the
+Similar to defining a Go test, create a file name `TASK_NAME_task.go` and name the task function in the
 format of
 
 ```go
 // Usage
 //
 // Description
-func TestXxx(*task.T) {
+func TaskXxx(*task.T) {
   ...
 }
 ```
 
 where `Xxx` can be any alphanumeric string (but the first letter must not be in [a-z]) and serves to identify the task routine.
 The comments for the task function will be automatically parsed as the task's usage and help description:
-The first block of the comment is the usage and the rest is description.
+The first block of the comment is the usage and the rest is the description.
 
 ## Installation
 
@@ -37,7 +37,7 @@ $ go get -u github.com/jingweno/gotask
 Create a file called `say_hello_task.go` and paste in the following content:
 
 ```go
-package examples
+package main
 
 import (
 	"fmt"
@@ -77,7 +77,7 @@ GLOBAL OPTIONS:
    --help, -h           show help
 ```
 
-The first block of the comment appear as the task usage for
+Noticing the first block of the comments appears as the task usage for
 `say-hello`. The rest become the description:
 
 ```plain
@@ -100,6 +100,8 @@ To execute the task, type:
 $ gotask say-hello
 Hello Owen Ou
 ```
+
+More [examples](https://github.com/jingweno/gotask/tree/master/examples) are available.
 
 ## License
 
