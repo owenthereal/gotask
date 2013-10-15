@@ -72,8 +72,7 @@ COMMANDS:
    help, h      Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --compile, -c        compile the task binary to pkg.task but do not
-run it
+   --compile, -c        compile the task binary to pkg.task but do not run it
    --version            print the version
    --help, -h           show help
 ```
@@ -101,3 +100,7 @@ To execute the task, type:
 $ gotask say-hello
 Hello Owen Ou
 ```
+
+## License
+
+`gotask` is released under the MIT license. See [LICENSE.md](https://github.com/jingweno/gotask/blob/master/LICENSE.md).
