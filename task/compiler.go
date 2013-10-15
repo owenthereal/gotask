@@ -20,7 +20,7 @@ func (c *compiler) Compile(outDir string) (execFile string, err error) {
 		return
 	}
 
-	execFile, err = compileTaskMain(c.currentDir, file)
+	execFile, err = compileTaskMain(c.currentDir, file, outDir)
 	return
 }
 
@@ -47,7 +47,7 @@ func writeTaskMain(work string, taskSet *TaskSet) (file string, err error) {
 	return
 }
 
-func compileTaskMain(sourceDir, mainFile string) (exec string, err error) {
+func compileTaskMain(sourceDir, mainFile, outDir string) (exec string, err error) {
 	taskDir := filepath.Dir(mainFile)
 
 	err = os.Chdir(taskDir)
@@ -56,7 +56,14 @@ func compileTaskMain(sourceDir, mainFile string) (exec string, err error) {
 	}
 
 	// TODO: consider caching build
-	err = execCmd("go", "build")
+	compileCmd := []string{"go", "build"}
+	if outDir != "" {
+		fileName := fmt.Sprintf("%s.task", filepath.Base(outDir))
+		exec = filepath.Join(outDir, fileName)
+		compileCmd = append(compileCmd, "-o", exec)
+	}
+
+	err = execCmd(compileCmd...)
 	if err != nil {
 		return
 	}
@@ -66,6 +73,12 @@ func compileTaskMain(sourceDir, mainFile string) (exec string, err error) {
 		return
 	}
 
+	// return if exec file has been assigned
+	if exec != "" {
+		return
+	}
+
+	// find exec file if it's not there
 	files, err := ioutil.ReadDir(taskDir)
 	if err != nil {
 		return
@@ -83,7 +96,7 @@ func compileTaskMain(sourceDir, mainFile string) (exec string, err error) {
 	return
 }
 
-func compileAndRun(args []string) (err error) {
+func compileAndRun(args []string, onlyOutput bool) (err error) {
 	source, err := os.Getwd()
 	if err != nil {
 		return
@@ -104,13 +117,20 @@ func compileAndRun(args []string) (err error) {
 		os.RemoveAll(work)
 	}()
 
+	var outDir string
+	if onlyOutput {
+		outDir = source
+	}
+
 	compiler := compiler{currentDir: source, workDir: work, TaskSet: taskSet}
-	execFile, err := compiler.Compile("")
+	execFile, err := compiler.Compile(outDir)
 	if err != nil {
 		return
 	}
 
-	runner := runner{execFile}
-	err = runner.Run(args)
+	if !onlyOutput {
+		runner := runner{execFile}
+		err = runner.Run(args)
+	}
 	return
 }

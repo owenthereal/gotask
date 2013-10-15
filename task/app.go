@@ -35,11 +35,19 @@ func NewApp() *cli.App {
 	app.Flags = []cli.Flag{
 		compileFlag{Usage: "compile the task binary to pkg.task but do not run it"},
 	}
-	//app.Action = func(c *cli.Context) {
-	//if len(c.Args()) == 0 {
-	//cli.ShowAppHelp(c)
-	//}
-	//}
+	app.Action = func(c *cli.Context) {
+		if c.Bool("c") || c.Bool("compile") {
+			err := compileAndRun(c.Args(), true)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+
+		if len(c.Args()) == 0 {
+			cli.ShowAppHelp(c)
+		}
+	}
 
 	return app
 }
@@ -65,7 +73,7 @@ func parseCommands() (cmds []cli.Command, err error) {
 			Action: func(c *cli.Context) {
 				a := []string{t.Name}
 				a = append(a, c.Args()...)
-				err := compileAndRun(a)
+				err := compileAndRun(a, false)
 				if err != nil {
 					log.Fatal(err)
 				}
