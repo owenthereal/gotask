@@ -1,4 +1,4 @@
-# gotask
+# gotask [![Build Status](https://travis-ci.org/jingweno/gotask.png?branch=master)](https://travis-ci.org/jingweno/gotask)
 
 A convention-over-configuration build tool in Go.
 
