@@ -16,8 +16,6 @@ import (
 	"unicode/utf8"
 )
 
-var taskFileSet = token.NewFileSet()
-
 type taskParser struct {
 	Dir string
 }
@@ -89,6 +87,7 @@ func filterTaskFiles(files []string) (taskFiles []string) {
 }
 
 func parseTasks(filename string) (tasks []Task, err error) {
+	taskFileSet := token.NewFileSet()
 	f, err := parser.ParseFile(taskFileSet, filename, nil, parser.ParseComments)
 	if err != nil {
 		return

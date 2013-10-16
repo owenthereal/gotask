@@ -23,10 +23,6 @@ type Task struct {
 	Action      func(*T)
 }
 
-func (t *Task) PrintHelp() {
-	fmt.Println(t.Description)
-}
-
 type T struct {
 	Args   []string
 	output []string
