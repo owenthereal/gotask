@@ -2,6 +2,10 @@
 
 A convention-over-configuration build tool in Go.
 
+## Motivation
+
+To write build tasks on a Go project in Go instead of Make, Rake or insert your build tool here.
+
 ## Overview
 
 `gotask` is a simple build tool designed for Go.
@@ -26,9 +30,9 @@ where `Xxx` can be any alphanumeric string (but the first letter must not be in 
 The comments for the task function will be automatically parsed as the task's usage and help description:
 The first block of the comment is the usage and the rest is the description.
 
-## Compiling tasks
+## Compiling Tasks
 
-`gotask` is able to compile defined tasks into a binary using `go build`.
+`gotask` is able to compile defined tasks into an executable using `go build`.
 This is useful when you need to distribute your build executables.
 See `gotask -c` for details.
 
@@ -40,7 +44,7 @@ $ go get -u github.com/jingweno/gotask
 
 ## Examples
 
-Create a file called `say_hello_task.go` and paste in the following content:
+On a [Go project](http://golang.org/doc/code.html#Organization), create a file called `say_hello_task.go` with the following content:
 
 ```go
 package main
@@ -60,7 +64,7 @@ func TaskSayHello(t *task.T) {
 }
 ```
 
-By convention, `gotask` is able to discover the task and dasherize the name:
+By convention, the `gotask` CLI is able to discover the task and dasherize the task name:
 
 ```plain
 $ gotask -h
@@ -84,7 +88,7 @@ GLOBAL OPTIONS:
 ```
 
 Noticing the first block of the comments appears as the task usage for
-`say-hello`. The rest become the description:
+`say-hello`, the rest become the description:
 
 ```plain
 $ gotask say-hello -h
@@ -107,7 +111,7 @@ $ gotask say-hello
 Hello Owen Ou
 ```
 
-To compile the task into binary using `go build`, type:
+To compile the task into an executable using `go build`, type:
 
 ```plain
 $ gotask -c
