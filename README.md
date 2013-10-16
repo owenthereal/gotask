@@ -111,7 +111,8 @@ $ gotask say-hello
 Hello Owen Ou
 ```
 
-To compile the task into an executable using `go build`, type:
+To compile the task into an executable named `pkg.task` where pkg is the
+last segment of the import path using `go build`, type:
 
 ```plain
 $ gotask -c
