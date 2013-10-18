@@ -1,3 +1,5 @@
+// +build gotask
+
 package examples
 
 import (

@@ -57,7 +57,7 @@ func (c *compiler) compileTaskMain(sourceDir, mainFile, outfile string) (exec st
 	}
 
 	// TODO: consider caching build
-	compileCmd := []string{"go", "build"}
+	compileCmd := []string{"go", "build", "--tags", "gotask"}
 	if outfile != "" {
 		exec = outfile
 		compileCmd = append(compileCmd, "-o", outfile)

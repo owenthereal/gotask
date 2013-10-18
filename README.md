@@ -18,10 +18,16 @@ Similar to defining a Go test, create a file called `TASK_NAME_task.go` and name
 format of
 
 ```go
+// +build gotask
+
+package main
+
+import "github.com/jingweno/gotask/tasking"
+
 // Usage
 //
 // Description
-func TaskXxx(*tasking.T) {
+func TaskXxx(t *tasking.T) {
   ...
 }
 ```
@@ -29,6 +35,7 @@ func TaskXxx(*tasking.T) {
 where `Xxx` can be any alphanumeric string (but the first letter must not be in [a-z]) and serves to identify the task routine.
 The comments for the task function will be automatically parsed as the task's usage and help description:
 The first block of the comment is the usage and the rest is the description.
+The `// +build gotask` [build tags](http://golang.org/pkg/go/build/#Context) constraint task functions to `gotask` build.
 
 ## Compiling Tasks
 
@@ -47,6 +54,8 @@ $ go get -u github.com/jingweno/gotask
 On a [Go project](http://golang.org/doc/code.html#Organization), create a file called `say_hello_task.go` with the following content:
 
 ```go
+// +build gotask
+
 package main
 
 import (
@@ -64,7 +73,10 @@ func TaskSayHello(t *tasking.T) {
 }
 ```
 
-By convention, the `gotask` CLI is able to discover the task and dasherize the task name:
+Make sure the build tag `// +build gotask` is the first line of the file and there's an empty line before package definition.
+Without the build tag, task functions will be available to the application build which may not be desired.
+By convention, the `gotask` CLI is able to discover the task and dasherize the task name.
+Running `gotask -h` displays all the tasks:
 
 ```plain
 $ gotask -h
