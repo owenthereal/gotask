@@ -103,8 +103,8 @@ func CompileAndRun(args []string, onlyOutput bool) (err error) {
 		return
 	}
 
-	parser := Parser{source}
-	taskSet, err := parser.Parse()
+	parser := NewParser()
+	taskSet, err := parser.Parse(source)
 	if err != nil {
 		return
 	}

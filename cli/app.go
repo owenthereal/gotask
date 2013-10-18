@@ -59,8 +59,8 @@ func parseCommands() (cmds []cli.Command, err error) {
 		return
 	}
 
-	parser := build.Parser{source}
-	taskSet, err := parser.Parse()
+	parser := build.NewParser()
+	taskSet, err := parser.Parse(source)
 	if err != nil {
 		return
 	}

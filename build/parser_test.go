@@ -6,8 +6,8 @@ import (
 )
 
 func TestParser_Load(t *testing.T) {
-	l := Parser{"../examples"}
-	ts, err := l.Parse()
+	p := NewParser()
+	ts, err := p.Parse("../examples")
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, "github.com/jingweno/gotask/examples", ts.ImportPath)

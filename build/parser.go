@@ -7,7 +7,7 @@ import (
 	"github.com/jingweno/gotask/tasking"
 	"go/ast"
 	"go/build"
-	"go/parser"
+	goparser "go/parser"
 	"go/token"
 	"io"
 	"path/filepath"
@@ -17,12 +17,14 @@ import (
 	"unicode/utf8"
 )
 
-type Parser struct {
-	Dir string
+func NewParser() *parser {
+	return &parser{}
 }
 
-func (l *Parser) Parse() (taskSet *tasking.TaskSet, err error) {
-	dir, err := expandDir(l.Dir)
+type parser struct{}
+
+func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
+	dir, err = expandDir(dir)
 	if err != nil {
 		return
 	}
@@ -89,7 +91,7 @@ func filterTaskFiles(files []string) (taskFiles []string) {
 
 func parseTasks(filename string) (tasks []tasking.Task, err error) {
 	taskFileSet := token.NewFileSet()
-	f, err := parser.ParseFile(taskFileSet, filename, nil, parser.ParseComments)
+	f, err := goparser.ParseFile(taskFileSet, filename, nil, goparser.ParseComments)
 	if err != nil {
 		return
 	}
