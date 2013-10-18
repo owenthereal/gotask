@@ -21,7 +21,7 @@ format of
 // Usage
 //
 // Description
-func TaskXxx(*task.T) {
+func TaskXxx(*tasking.T) {
   ...
 }
 ```
