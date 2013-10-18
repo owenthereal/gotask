@@ -10,22 +10,22 @@ import (
 )
 
 type compiler struct {
-	currentDir string
-	workDir    string
-	TaskSet    *tasking.TaskSet
+	sourceDir string
+	workDir   string
+	TaskSet   *tasking.TaskSet
 }
 
 func (c *compiler) Compile(outfile string) (execFile string, err error) {
-	file, err := writeTaskMain(c.workDir, c.TaskSet)
+	file, err := c.writeTaskMain(c.workDir, c.TaskSet)
 	if err != nil {
 		return
 	}
 
-	execFile, err = compileTaskMain(c.currentDir, file, outfile)
+	execFile, err = c.compileTaskMain(c.sourceDir, file, outfile)
 	return
 }
 
-func writeTaskMain(work string, taskSet *tasking.TaskSet) (file string, err error) {
+func (c *compiler) writeTaskMain(work string, taskSet *tasking.TaskSet) (file string, err error) {
 	// create task dir
 	taskDir := filepath.Join(work, filepath.FromSlash(taskSet.ImportPath))
 	err = os.MkdirAll(taskDir, 0777)
@@ -48,7 +48,7 @@ func writeTaskMain(work string, taskSet *tasking.TaskSet) (file string, err erro
 	return
 }
 
-func compileTaskMain(sourceDir, mainFile, outfile string) (exec string, err error) {
+func (c *compiler) compileTaskMain(sourceDir, mainFile, outfile string) (exec string, err error) {
 	taskDir := filepath.Dir(mainFile)
 
 	err = os.Chdir(taskDir)
@@ -92,7 +92,7 @@ func compileTaskMain(sourceDir, mainFile, outfile string) (exec string, err erro
 		}
 	}
 
-	err = fmt.Errorf("can't build task main %s", mainFile)
+	err = fmt.Errorf("can't locate build executable for task main %s", mainFile)
 	return
 }
 
@@ -117,7 +117,7 @@ func Run(sourceDir string, args []string) (err error) {
 	}
 
 	err = withTempDir(func(work string) (err error) {
-		compiler := compiler{currentDir: sourceDir, workDir: work, TaskSet: taskSet}
+		compiler := compiler{sourceDir: sourceDir, workDir: work, TaskSet: taskSet}
 		execFile, err := compiler.Compile("")
 		if err != nil {
 			return
@@ -139,7 +139,7 @@ func Compile(sourceDir string, outfile string) (err error) {
 	}
 
 	err = withTempDir(func(work string) (err error) {
-		compiler := compiler{currentDir: sourceDir, workDir: work, TaskSet: taskSet}
+		compiler := compiler{sourceDir: sourceDir, workDir: work, TaskSet: taskSet}
 		_, err = compiler.Compile(outfile)
 		return
 	})
