@@ -1,4 +1,4 @@
-package task
+package build
 
 type runner struct {
 	execFile string

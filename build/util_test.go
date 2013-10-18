@@ -1,4 +1,4 @@
-package task
+package build
 
 import (
 	"github.com/bmizerany/assert"

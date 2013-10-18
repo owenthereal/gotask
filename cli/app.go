@@ -1,9 +1,10 @@
-package task
+package cli
 
 import (
 	"flag"
 	"fmt"
 	"github.com/codegangsta/cli"
+	"github.com/jingweno/gotask/build"
 	"log"
 	"os"
 )
@@ -37,7 +38,7 @@ func NewApp() *cli.App {
 	}
 	app.Action = func(c *cli.Context) {
 		if c.Bool("c") || c.Bool("compile") {
-			err := compileAndRun(c.Args(), true)
+			err := build.CompileAndRun(c.Args(), true)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -58,7 +59,7 @@ func parseCommands() (cmds []cli.Command, err error) {
 		return
 	}
 
-	parser := taskParser{source}
+	parser := build.Parser{source}
 	taskSet, err := parser.Parse()
 	if err != nil {
 		return
@@ -73,7 +74,7 @@ func parseCommands() (cmds []cli.Command, err error) {
 			Action: func(c *cli.Context) {
 				a := []string{t.Name}
 				a = append(a, c.Args()...)
-				err := compileAndRun(a, false)
+				err := build.CompileAndRun(a, false)
 				if err != nil {
 					log.Fatal(err)
 				}

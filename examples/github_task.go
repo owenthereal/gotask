@@ -3,7 +3,7 @@ package examples
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/jingweno/gotask/task"
+	"github.com/jingweno/gotask/tasking"
 	"io/ioutil"
 	"net/http"
 )
@@ -15,7 +15,7 @@ import (
 // For example
 //
 // $ gotask git-hub-user jingweno
-func TaskGitHubUser(t *task.T) {
+func TaskGitHubUser(t *tasking.T) {
 	if len(t.Args) == 0 {
 		t.Error("No GitHub user login is provided!")
 		return

@@ -1,9 +1,10 @@
-package task
+package build
 
 import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/jingweno/gotask/tasking"
 	"go/ast"
 	"go/build"
 	"go/parser"
@@ -16,11 +17,11 @@ import (
 	"unicode/utf8"
 )
 
-type taskParser struct {
+type Parser struct {
 	Dir string
 }
 
-func (l *taskParser) Parse() (taskSet *TaskSet, err error) {
+func (l *Parser) Parse() (taskSet *tasking.TaskSet, err error) {
 	dir, err := expandDir(l.Dir)
 	if err != nil {
 		return
@@ -42,7 +43,7 @@ func (l *taskParser) Parse() (taskSet *TaskSet, err error) {
 		return
 	}
 
-	taskSet = &TaskSet{Name: p.Name, Dir: p.Dir, ImportPath: p.ImportPath, Tasks: tasks}
+	taskSet = &tasking.TaskSet{Name: p.Name, Dir: p.Dir, ImportPath: p.ImportPath, Tasks: tasks}
 
 	return
 }
@@ -61,7 +62,7 @@ func expandDir(dir string) (expanded string, err error) {
 	return
 }
 
-func loadTasks(dir string, files []string) (tasks []Task, err error) {
+func loadTasks(dir string, files []string) (tasks []tasking.Task, err error) {
 	taskFiles := filterTaskFiles(files)
 	for _, taskFile := range taskFiles {
 		ts, e := parseTasks(filepath.Join(dir, taskFile))
@@ -86,7 +87,7 @@ func filterTaskFiles(files []string) (taskFiles []string) {
 	return
 }
 
-func parseTasks(filename string) (tasks []Task, err error) {
+func parseTasks(filename string) (tasks []tasking.Task, err error) {
 	taskFileSet := token.NewFileSet()
 	f, err := parser.ParseFile(taskFileSet, filename, nil, parser.ParseComments)
 	if err != nil {
@@ -111,7 +112,7 @@ func parseTasks(filename string) (tasks []Task, err error) {
 			}
 
 			name := convertActionNameToTaskName(actionName)
-			t := Task{Name: name, ActionName: actionName, Usage: usage, Description: desc}
+			t := tasking.Task{Name: name, ActionName: actionName, Usage: usage, Description: desc}
 			tasks = append(tasks, t)
 		}
 	}

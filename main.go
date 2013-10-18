@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/jingweno/gotask/task"
+	"github.com/jingweno/gotask/cli"
 	"os"
 )
 
 func main() {
-	app := task.NewApp()
+	app := cli.NewApp()
 	app.Run(os.Args)
 }

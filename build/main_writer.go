@@ -1,12 +1,13 @@
-package task
+package build
 
 import (
+	"github.com/jingweno/gotask/tasking"
 	"io"
 	"text/template"
 )
 
 type mainWriter struct {
-	TaskSet *TaskSet
+	TaskSet *tasking.TaskSet
 }
 
 func (w *mainWriter) Write(wr io.Writer) (err error) {
@@ -19,19 +20,19 @@ package main
 
 import (
   "os"
-  "github.com/jingweno/gotask/task"
+  "github.com/jingweno/gotask/tasking"
 {{if .HasTasks}}
   _task "{{.ImportPath}}"
 {{end}}
 )
 
-var tasks = []task.Task{
+var tasks = []tasking.Task{
 {{range .Tasks}}
   {Name: "{{.Name}}", Usage: {{.Usage | printf "%q"}}, Description: {{.Description | printf "%q"}}, Action: _task.{{.ActionName}}},
 {{end}}
 }
 
-var taskSet = task.TaskSet{
+var taskSet = tasking.TaskSet{
   Name: "{{.Name}}",
   Dir: "{{.Dir}}",
   ImportPath: "{{.ImportPath}}",
@@ -39,6 +40,6 @@ var taskSet = task.TaskSet{
 }
 
 func main() {
-  task.RunTaskSet(&taskSet, os.Args)
+  tasking.RunTaskSet(&taskSet, os.Args)
 }
 `))

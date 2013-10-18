@@ -1,7 +1,8 @@
-package task
+package build
 
 import (
 	"fmt"
+	"github.com/jingweno/gotask/tasking"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,7 +12,7 @@ import (
 type compiler struct {
 	currentDir string
 	workDir    string
-	TaskSet    *TaskSet
+	TaskSet    *tasking.TaskSet
 }
 
 func (c *compiler) Compile(outDir string) (execFile string, err error) {
@@ -24,7 +25,7 @@ func (c *compiler) Compile(outDir string) (execFile string, err error) {
 	return
 }
 
-func writeTaskMain(work string, taskSet *TaskSet) (file string, err error) {
+func writeTaskMain(work string, taskSet *tasking.TaskSet) (file string, err error) {
 	// create task dir
 	taskDir := filepath.Join(work, filepath.FromSlash(taskSet.ImportPath))
 	err = os.MkdirAll(taskDir, 0777)
@@ -96,13 +97,13 @@ func compileTaskMain(sourceDir, mainFile, outDir string) (exec string, err error
 	return
 }
 
-func compileAndRun(args []string, onlyOutput bool) (err error) {
+func CompileAndRun(args []string, onlyOutput bool) (err error) {
 	source, err := os.Getwd()
 	if err != nil {
 		return
 	}
 
-	parser := taskParser{source}
+	parser := Parser{source}
 	taskSet, err := parser.Parse()
 	if err != nil {
 		return

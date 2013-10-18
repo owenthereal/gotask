@@ -1,12 +1,12 @@
-package task
+package build
 
 import (
 	"github.com/bmizerany/assert"
 	"testing"
 )
 
-func TestTaskParser_Load(t *testing.T) {
-	l := taskParser{"../examples"}
+func TestParser_Load(t *testing.T) {
+	l := Parser{"../examples"}
 	ts, err := l.Parse()
 
 	assert.Equal(t, nil, err)
@@ -22,7 +22,7 @@ func TestTaskParser_filterTaskFiles(t *testing.T) {
 	assert.Equal(t, "file_task.go", taskFiles[0])
 }
 
-func TestTaskParser_parseTasks(t *testing.T) {
+func TestParser_parseTasks(t *testing.T) {
 	tasks, _ := parseTasks("../examples/say_hello_task.go")
 
 	assert.Equal(t, 1, len(tasks))

@@ -1,8 +1,9 @@
-package task
+package build
 
 import (
 	"bytes"
 	"github.com/bmizerany/assert"
+	"github.com/jingweno/gotask/tasking"
 	"strings"
 	"testing"
 )
@@ -10,9 +11,9 @@ import (
 func TestMainWriter_Write(t *testing.T) {
 	var out bytes.Buffer
 	b := mainWriter{
-		&TaskSet{
+		&tasking.TaskSet{
 			ImportPath: "github.com/jingweno/gotask/examples",
-			Tasks:      []Task{{Name: "HelloWorld", ActionName: "TaskHelloWorld", Usage: "Say Hello world", Description: "Print out Hello World"}},
+			Tasks:      []tasking.Task{{Name: "HelloWorld", ActionName: "TaskHelloWorld", Usage: "Say Hello world", Description: "Print out Hello World"}},
 		},
 	}
 	b.Write(&out)
