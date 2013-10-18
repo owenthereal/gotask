@@ -7,16 +7,16 @@ import (
 	"os"
 )
 
-func RunTaskSet(taskSet *TaskSet, args []string) {
-	runner := taskRunner{TaskSet: taskSet}
+func Run(taskSet *TaskSet, args []string) {
+	runner := runner{TaskSet: taskSet}
 	runner.Run(args)
 }
 
-type taskRunner struct {
+type runner struct {
 	TaskSet *TaskSet
 }
 
-func (r *taskRunner) Run(args []string) {
+func (r *runner) Run(args []string) {
 	cmds := convertToCommands(r.TaskSet.Tasks)
 	app := cli.NewApp()
 	app.Name = r.TaskSet.Name
@@ -26,14 +26,14 @@ func (r *taskRunner) Run(args []string) {
 }
 
 func convertToCommands(tasks []Task) (cmds []cli.Command) {
-	for _, task := range tasks {
-		t := task
+	for _, t := range tasks {
+		task := t
 		cmd := cli.Command{
 			Name:        task.Name,
 			Usage:       task.Usage,
 			Description: task.Description,
 			Action: func(c *cli.Context) {
-				runTask(t, c.Args())
+				runTask(task, c.Args())
 			},
 		}
 

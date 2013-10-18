@@ -40,6 +40,6 @@ var taskSet = tasking.TaskSet{
 }
 
 func main() {
-  tasking.RunTaskSet(&taskSet, os.Args)
+  tasking.Run(&taskSet, os.Args)
 }
 `))
