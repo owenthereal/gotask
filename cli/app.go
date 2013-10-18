@@ -7,6 +7,7 @@ import (
 	"github.com/jingweno/gotask/build"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 type compileFlag struct {
@@ -38,10 +39,11 @@ func NewApp() *cli.App {
 	}
 	app.Action = func(c *cli.Context) {
 		if c.Bool("c") || c.Bool("compile") {
-			err := build.CompileAndRun(c.Args(), true)
+			err := compileTasks()
 			if err != nil {
 				log.Fatal(err)
 			}
+
 			return
 		}
 
@@ -74,7 +76,7 @@ func parseCommands() (cmds []cli.Command, err error) {
 			Action: func(c *cli.Context) {
 				args := []string{task.Name}
 				args = append(args, c.Args()...)
-				err := build.CompileAndRun(args, false)
+				err := runTasks(args)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -84,5 +86,28 @@ func parseCommands() (cmds []cli.Command, err error) {
 		cmds = append(cmds, cmd)
 	}
 
+	return
+}
+
+func compileTasks() (err error) {
+	sourceDir, err := os.Getwd()
+	if err != nil {
+		return
+	}
+
+	fileName := fmt.Sprintf("%s.task", filepath.Base(sourceDir))
+	outfile := filepath.Join(sourceDir, fileName)
+
+	err = build.Compile(sourceDir, outfile)
+	return
+}
+
+func runTasks(args []string) (err error) {
+	sourceDir, err := os.Getwd()
+	if err != nil {
+		return
+	}
+
+	err = build.Run(sourceDir, args)
 	return
 }

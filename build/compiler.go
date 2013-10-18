@@ -15,13 +15,13 @@ type compiler struct {
 	TaskSet    *tasking.TaskSet
 }
 
-func (c *compiler) Compile(outDir string) (execFile string, err error) {
+func (c *compiler) Compile(outfile string) (execFile string, err error) {
 	file, err := writeTaskMain(c.workDir, c.TaskSet)
 	if err != nil {
 		return
 	}
 
-	execFile, err = compileTaskMain(c.currentDir, file, outDir)
+	execFile, err = compileTaskMain(c.currentDir, file, outfile)
 	return
 }
 
@@ -48,7 +48,7 @@ func writeTaskMain(work string, taskSet *tasking.TaskSet) (file string, err erro
 	return
 }
 
-func compileTaskMain(sourceDir, mainFile, outDir string) (exec string, err error) {
+func compileTaskMain(sourceDir, mainFile, outfile string) (exec string, err error) {
 	taskDir := filepath.Dir(mainFile)
 
 	err = os.Chdir(taskDir)
@@ -58,10 +58,9 @@ func compileTaskMain(sourceDir, mainFile, outDir string) (exec string, err error
 
 	// TODO: consider caching build
 	compileCmd := []string{"go", "build"}
-	if outDir != "" {
-		fileName := fmt.Sprintf("%s.task", filepath.Base(outDir))
-		exec = filepath.Join(outDir, fileName)
-		compileCmd = append(compileCmd, "-o", exec)
+	if outfile != "" {
+		exec = outfile
+		compileCmd = append(compileCmd, "-o", outfile)
 	}
 
 	err = execCmd(compileCmd...)
@@ -97,41 +96,53 @@ func compileTaskMain(sourceDir, mainFile, outDir string) (exec string, err error
 	return
 }
 
-func CompileAndRun(args []string, onlyOutput bool) (err error) {
-	source, err := os.Getwd()
-	if err != nil {
-		return
-	}
-
-	parser := NewParser()
-	taskSet, err := parser.Parse(source)
-	if err != nil {
-		return
-	}
-
-	// create temp work dir
-	work, err := ioutil.TempDir("", "go-task")
+func withTempDir(f func(string) error) (err error) {
+	temp, err := ioutil.TempDir("", "go-task")
 	if err != nil {
 		return
 	}
 	defer func() {
-		os.RemoveAll(work)
+		os.RemoveAll(temp)
 	}()
 
-	var outDir string
-	if onlyOutput {
-		outDir = source
-	}
+	err = f(temp)
+	return
+}
 
-	compiler := compiler{currentDir: source, workDir: work, TaskSet: taskSet}
-	execFile, err := compiler.Compile(outDir)
+func Run(sourceDir string, args []string) (err error) {
+	parser := NewParser()
+	taskSet, err := parser.Parse(sourceDir)
 	if err != nil {
 		return
 	}
 
-	if !onlyOutput {
+	err = withTempDir(func(work string) (err error) {
+		compiler := compiler{currentDir: sourceDir, workDir: work, TaskSet: taskSet}
+		execFile, err := compiler.Compile("")
+		if err != nil {
+			return
+		}
+
 		runner := runner{execFile}
 		err = runner.Run(args)
+		return
+	})
+
+	return
+}
+
+func Compile(sourceDir string, outfile string) (err error) {
+	parser := NewParser()
+	taskSet, err := parser.Parse(sourceDir)
+	if err != nil {
+		return
 	}
+
+	err = withTempDir(func(work string) (err error) {
+		compiler := compiler{currentDir: sourceDir, workDir: work, TaskSet: taskSet}
+		_, err = compiler.Compile(outfile)
+		return
+	})
+
 	return
 }
