@@ -65,21 +65,22 @@ func parseCommands() (cmds []cli.Command, err error) {
 		return
 	}
 
-	for _, task := range taskSet.Tasks {
-		t := task
+	for _, t := range taskSet.Tasks {
+		task := t
 		cmd := cli.Command{
 			Name:        task.Name,
 			Usage:       task.Usage,
 			Description: task.Description,
 			Action: func(c *cli.Context) {
-				a := []string{t.Name}
-				a = append(a, c.Args()...)
-				err := build.CompileAndRun(a, false)
+				args := []string{task.Name}
+				args = append(args, c.Args()...)
+				err := build.CompileAndRun(args, false)
 				if err != nil {
 					log.Fatal(err)
 				}
 			},
 		}
+
 		cmds = append(cmds, cmd)
 	}
 
