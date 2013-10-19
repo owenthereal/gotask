@@ -45,7 +45,12 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 		return
 	}
 
-	taskSet = &tasking.TaskSet{Name: p.Name, Dir: p.Dir, ImportPath: p.ImportPath, Tasks: tasks}
+	name := p.Name
+	if name == "" {
+		name = filepath.Base(p.Dir)
+	}
+
+	taskSet = &tasking.TaskSet{Name: name, Dir: p.Dir, ImportPath: p.ImportPath, Tasks: tasks}
 
 	return
 }
