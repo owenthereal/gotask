@@ -3,7 +3,9 @@ package tasking
 import (
 	"fmt"
 	"github.com/kballard/go-shellquote"
+	"os"
 	"strings"
+	"sync"
 )
 
 type TaskSet struct {
@@ -26,6 +28,7 @@ type Task struct {
 }
 
 type T struct {
+	mu     sync.RWMutex
 	Args   []string
 	output []string
 	failed bool
@@ -49,27 +52,31 @@ func (t *T) Exec(cmd ...string) (err error) {
 }
 
 func (t *T) fail() {
+	t.mu.Lock()
+	defer t.mu.Unlock()
 	t.failed = true
 }
 
+func (t *T) Failed() bool {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	return t.failed
+}
+
 func (t *T) Log(args ...interface{}) {
-	t.log(fmt.Sprintln(args...))
+	fmt.Println(args...)
 }
 
 func (t *T) Logf(format string, args ...interface{}) {
-	t.log(fmt.Sprintf(format, args...))
+	fmt.Printf(format, args...)
 }
 
 func (t *T) Error(args ...interface{}) {
-	t.log(fmt.Sprintln(args...))
+	fmt.Fprintln(os.Stderr, args...)
 	t.fail()
 }
 
 func (t *T) Errorf(format string, args ...interface{}) {
-	t.log(fmt.Sprintf(format, args...))
+	fmt.Fprintf(os.Stderr, format, args...)
 	t.fail()
-}
-
-func (t *T) log(s string) {
-	t.output = append(t.output, s)
 }

@@ -1,9 +1,7 @@
 package tasking
 
 import (
-	"fmt"
 	"github.com/codegangsta/cli"
-	"io"
 	"os"
 )
 
@@ -46,14 +44,7 @@ func convertToCommands(tasks []Task) (cmds []cli.Command) {
 func runTask(task Task, args []string) {
 	t := &T{Args: args}
 	task.Action(t)
-	var writer io.Writer
-	if t.failed {
-		writer = os.Stderr
-	} else {
-		writer = os.Stdout
-	}
-
-	for _, out := range t.output {
-		fmt.Fprintf(writer, "%v", out)
+	if t.Failed() {
+		os.Exit(1)
 	}
 }
