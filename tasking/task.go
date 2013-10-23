@@ -2,6 +2,8 @@ package tasking
 
 import (
 	"fmt"
+	"github.com/kballard/go-shellquote"
+	"strings"
 )
 
 type TaskSet struct {
@@ -27,6 +29,23 @@ type T struct {
 	Args   []string
 	output []string
 	failed bool
+}
+
+// Run the system command. If multiple arguments are given, they're concatenated to one command.
+//
+// Example:
+//   t.Exec("ls -ltr")
+//   t.Exec("ls", FILE1, FILE2)
+func (t *T) Exec(cmd ...string) (err error) {
+	toRun := strings.Join(cmd, " ")
+	input, err := shellquote.Split(toRun)
+	if err != nil {
+		return
+	}
+
+	err = execCmd(input)
+
+	return
 }
 
 func (t *T) fail() {
