@@ -11,6 +11,7 @@ import (
 type TaskSet struct {
 	Name       string
 	Dir        string
+	PkgObj     string
 	ImportPath string
 	Tasks      []Task
 }

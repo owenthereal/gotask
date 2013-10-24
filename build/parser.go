@@ -10,6 +10,7 @@ import (
 	goparser "go/parser"
 	"go/token"
 	"io"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -29,7 +30,19 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 		return
 	}
 
-	p, e := build.ImportDir(dir, 0)
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		err = fmt.Errorf("No environment variable GOPATH found")
+		return
+	}
+
+	srcPath := filepath.Join(gopath, "src/")
+	path, err := filepath.Rel(srcPath, dir)
+	if err != nil {
+		return
+	}
+
+	p, e := build.Import(path, dir, 0)
 	taskFiles := append(p.GoFiles, p.IgnoredGoFiles...)
 	taskFiles = append(taskFiles, p.CgoFiles...)
 	if e != nil {
@@ -50,7 +63,7 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 		name = filepath.Base(p.Dir)
 	}
 
-	taskSet = &tasking.TaskSet{Name: name, Dir: p.Dir, ImportPath: p.ImportPath, Tasks: tasks}
+	taskSet = &tasking.TaskSet{Name: name, Dir: p.Dir, PkgObj: p.PkgObj, ImportPath: p.ImportPath, Tasks: tasks}
 
 	return
 }

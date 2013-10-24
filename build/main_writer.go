@@ -35,6 +35,7 @@ var tasks = []tasking.Task{
 var taskSet = tasking.TaskSet{
   Name: "{{.Name}}",
   Dir: "{{.Dir}}",
+  PkgObj: "{{.PkgObj}}",
   ImportPath: "{{.ImportPath}}",
   Tasks: tasks,
 }
