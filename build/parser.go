@@ -25,7 +25,7 @@ func NewParser() *parser {
 type parser struct{}
 
 func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
-	dir, err = expandDir(dir)
+	dir, err = expandPath(dir)
 	if err != nil {
 		return
 	}
@@ -35,6 +35,10 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 		err = fmt.Errorf("No environment variable GOPATH found")
 		return
 	}
+	gopath, err = expandPath(gopath)
+	if err != nil {
+		return
+	}
 
 	srcPath := filepath.Join(gopath, "src")
 	path, err := filepath.Rel(srcPath, dir)
@@ -42,8 +46,8 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 		return
 	}
 
-  fmt.Println(path)
-  fmt.Println(dir)
+	fmt.Println(path)
+	fmt.Println(dir)
 
 	p, e := build.Import(path, dir, 0)
 	taskFiles := append(p.GoFiles, p.IgnoredGoFiles...)
@@ -71,7 +75,7 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 	return
 }
 
-func expandDir(dir string) (expanded string, err error) {
+func expandPath(dir string) (expanded string, err error) {
 	expanded, err = filepath.Abs(dir)
 	if err != nil {
 		return
