@@ -1,10 +1,22 @@
 package build
 
 import (
+	"fmt"
 	"github.com/bmizerany/assert"
+	"os"
 	"strings"
 	"testing"
 )
+
+func TestParser_findImportPath(t *testing.T) {
+	gopath := os.Getenv("GOPATH")
+	gopath = fmt.Sprintf("/etc:%s", gopath)
+	dir, _ := expandPath("../examples")
+	importPath, err := findImportPath(gopath, dir)
+
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "github.com/jingweno/gotask/examples", importPath)
+}
 
 func TestParser_Load(t *testing.T) {
 	p := NewParser()

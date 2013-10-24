@@ -30,26 +30,12 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 		return
 	}
 
-	gopath := os.Getenv("GOPATH")
-	if gopath == "" {
-		err = fmt.Errorf("No environment variable GOPATH found")
-		return
-	}
-	gopath, err = expandPath(gopath)
+	importPath, err := findImportPath(os.Getenv("GOPATH"), dir)
 	if err != nil {
 		return
 	}
 
-	srcPath := filepath.Join(gopath, "src")
-	path, err := filepath.Rel(srcPath, dir)
-	if err != nil {
-		return
-	}
-
-	fmt.Println(path)
-	fmt.Println(dir)
-
-	p, e := build.Import(path, dir, 0)
+	p, e := build.Import(importPath, dir, 0)
 	taskFiles := append(p.GoFiles, p.IgnoredGoFiles...)
 	taskFiles = append(taskFiles, p.CgoFiles...)
 	if e != nil {
@@ -75,15 +61,46 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 	return
 }
 
-func expandPath(dir string) (expanded string, err error) {
-	expanded, err = filepath.Abs(dir)
+func expandPath(path string) (expanded string, err error) {
+	expanded, err = filepath.Abs(path)
 	if err != nil {
 		return
 	}
 
-	if !isFileExist(dir) {
-		err = fmt.Errorf("Directory %s does not exist", dir)
+	if !isFileExist(expanded) {
+		err = fmt.Errorf("Path %s does not exist", expanded)
 		return
+	}
+
+	return
+}
+
+func findImportPath(gp, dir string) (importPath string, err error) {
+	gopaths := strings.Split(gp, ":")
+	if len(gopaths) == 0 {
+		err = fmt.Errorf("No environment variable GOPATH found")
+		return
+	}
+
+	for _, gopath := range gopaths {
+		gopath, e := expandPath(gopath)
+		if e != nil {
+			continue
+		}
+
+		srcPath := filepath.Join(gopath, "src")
+		if !strings.HasPrefix(dir, srcPath) {
+			continue
+		}
+
+		importPath, e = filepath.Rel(srcPath, dir)
+		if e == nil && importPath != "" {
+			break
+		}
+	}
+
+	if importPath == "" {
+		err = fmt.Errorf("Can't find import path in %s", dir)
 	}
 
 	return
