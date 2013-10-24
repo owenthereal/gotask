@@ -22,7 +22,7 @@ func (c *compiler) Compile(outfile string) (execFile string, err error) {
 		return
 	}
 
-	err = c.removePkgObjs()
+	err = c.removeInstalledPkgs()
 	if err != nil {
 		return
 	}
@@ -31,24 +31,27 @@ func (c *compiler) Compile(outfile string) (execFile string, err error) {
 	return
 }
 
-func (c *compiler) removePkgObjs() (err error) {
+func (c *compiler) removeInstalledPkgs() (err error) {
 	pkgObj := c.TaskSet.PkgObj
 	if pkgObj == "" {
 		return
 	}
 
-	pkgDir := strings.TrimRight(pkgObj, ".a")
 	if c.isDebug {
 		debugf("removing installed package %s", pkgObj)
-		debugf("removing installed package %s", pkgDir)
 	}
-
 	err = os.RemoveAll(pkgObj)
 	if err != nil {
 		return
 	}
 
+	pkgDir := strings.TrimRight(pkgObj, ".a")
+	if c.isDebug {
+		debugf("removing installed package %s", pkgDir)
+	}
+
 	err = os.RemoveAll(pkgDir)
+
 	return
 }
 
