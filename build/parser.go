@@ -36,7 +36,7 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 		return
 	}
 
-	srcPath := filepath.Join(gopath, "src/")
+	srcPath := filepath.Join(gopath, "src")
 	path, err := filepath.Rel(srcPath, dir)
 	if err != nil {
 		return

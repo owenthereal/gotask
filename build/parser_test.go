@@ -2,6 +2,7 @@ package build
 
 import (
 	"github.com/bmizerany/assert"
+	"strings"
 	"testing"
 )
 
@@ -10,6 +11,7 @@ func TestParser_Load(t *testing.T) {
 	ts, err := p.Parse("../examples")
 
 	assert.Equal(t, nil, err)
+	assert.Tf(t, strings.HasSuffix(ts.PkgObj, "github.com/jingweno/gotask/examples.a"), "%s", ts.PkgObj)
 	assert.Equal(t, "github.com/jingweno/gotask/examples", ts.ImportPath)
 	assert.Equal(t, 2, len(ts.Tasks))
 }
