@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 )
 
+var debugFlag = cli.BoolFlag{"debug", "run in debug mode"}
+
 type compileFlag struct {
 	Usage string
 }
@@ -36,10 +38,11 @@ func NewApp() *cli.App {
 	app.Commands = cmds
 	app.Flags = []cli.Flag{
 		compileFlag{Usage: "compile the task binary to pkg.task but do not run it"},
+		debugFlag,
 	}
 	app.Action = func(c *cli.Context) {
 		if c.Bool("c") || c.Bool("compile") {
-			err := compileTasks()
+			err := compileTasks(c.Bool("debug"))
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -74,7 +77,7 @@ func parseCommands() (cmds []cli.Command, err error) {
 			Usage:       task.Usage,
 			Description: task.Description,
 			Flags: []cli.Flag{
-				cli.BoolFlag{"debug", "run in debug mode"},
+				debugFlag,
 			},
 			Action: func(c *cli.Context) {
 				args := []string{task.Name}
@@ -92,7 +95,7 @@ func parseCommands() (cmds []cli.Command, err error) {
 	return
 }
 
-func compileTasks() (err error) {
+func compileTasks(isDebug bool) (err error) {
 	sourceDir, err := os.Getwd()
 	if err != nil {
 		return
@@ -101,7 +104,7 @@ func compileTasks() (err error) {
 	fileName := fmt.Sprintf("%s.task", filepath.Base(sourceDir))
 	outfile := filepath.Join(sourceDir, fileName)
 
-	err = build.Compile(sourceDir, outfile)
+	err = build.Compile(sourceDir, outfile, isDebug)
 	return
 }
 
