@@ -42,6 +42,9 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 		return
 	}
 
+  fmt.Println(path)
+  fmt.Println(dir)
+
 	p, e := build.Import(path, dir, 0)
 	taskFiles := append(p.GoFiles, p.IgnoredGoFiles...)
 	taskFiles = append(taskFiles, p.CgoFiles...)
