@@ -22,7 +22,33 @@ func (c *compiler) Compile(outfile string) (execFile string, err error) {
 		return
 	}
 
+	err = c.removePkgObjs()
+	if err != nil {
+		return
+	}
+
 	execFile, err = c.compileTaskMain(c.sourceDir, file, outfile)
+	return
+}
+
+func (c *compiler) removePkgObjs() (err error) {
+	pkgObj := c.TaskSet.PkgObj
+	if pkgObj == "" {
+		return
+	}
+
+	pkgDir := strings.TrimRight(pkgObj, ".a")
+	if c.isDebug {
+		debugf("removing installed package %s", pkgObj)
+		debugf("removing installed package %s", pkgDir)
+	}
+
+	err = os.RemoveAll(pkgObj)
+	if err != nil {
+		return
+	}
+
+	err = os.RemoveAll(pkgDir)
 	return
 }
 
@@ -109,7 +135,7 @@ func withTempDir(isDebug bool, f func(string) error) (err error) {
 	}()
 
 	if isDebug {
-		debugf("build location: %s\n", temp)
+		debugf("building tasks in %s\n", temp)
 	}
 	err = f(temp)
 	return
