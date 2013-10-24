@@ -13,6 +13,7 @@ type compiler struct {
 	sourceDir string
 	workDir   string
 	TaskSet   *tasking.TaskSet
+	isDebug   bool
 }
 
 func (c *compiler) Compile(outfile string) (execFile string, err error) {
@@ -96,28 +97,33 @@ func (c *compiler) compileTaskMain(sourceDir, mainFile, outfile string) (exec st
 	return
 }
 
-func withTempDir(f func(string) error) (err error) {
+func withTempDir(isDebug bool, f func(string) error) (err error) {
 	temp, err := ioutil.TempDir("", "go-task")
 	if err != nil {
 		return
 	}
 	defer func() {
-		os.RemoveAll(temp)
+		if !isDebug {
+			os.RemoveAll(temp)
+		}
 	}()
 
+	if isDebug {
+		debugf("build location: %s\n", temp)
+	}
 	err = f(temp)
 	return
 }
 
-func Run(sourceDir string, args []string) (err error) {
+func Run(sourceDir string, args []string, isDebug bool) (err error) {
 	parser := NewParser()
 	taskSet, err := parser.Parse(sourceDir)
 	if err != nil {
 		return
 	}
 
-	err = withTempDir(func(work string) (err error) {
-		compiler := compiler{sourceDir: sourceDir, workDir: work, TaskSet: taskSet}
+	err = withTempDir(isDebug, func(work string) (err error) {
+		compiler := compiler{sourceDir: sourceDir, workDir: work, TaskSet: taskSet, isDebug: isDebug}
 		execFile, err := compiler.Compile("")
 		if err != nil {
 			return
@@ -138,7 +144,7 @@ func Compile(sourceDir string, outfile string) (err error) {
 		return
 	}
 
-	err = withTempDir(func(work string) (err error) {
+	err = withTempDir(false, func(work string) (err error) {
 		compiler := compiler{sourceDir: sourceDir, workDir: work, TaskSet: taskSet}
 		_, err = compiler.Compile(outfile)
 		return

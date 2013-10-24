@@ -2,6 +2,7 @@ package build
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"regexp"
@@ -42,4 +43,9 @@ func dasherize(s string) string {
 	s = strings.ToLower(s)
 
 	return s
+}
+
+func debugf(format string, v ...interface{}) {
+	msg := fmt.Sprintf(format, v...)
+	log.Printf("debug - %s", msg)
 }

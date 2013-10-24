@@ -73,10 +73,13 @@ func parseCommands() (cmds []cli.Command, err error) {
 			Name:        task.Name,
 			Usage:       task.Usage,
 			Description: task.Description,
+			Flags: []cli.Flag{
+				cli.BoolFlag{"debug", "run in debug mode"},
+			},
 			Action: func(c *cli.Context) {
 				args := []string{task.Name}
 				args = append(args, c.Args()...)
-				err := runTasks(args)
+				err := runTasks(args, c.Bool("debug"))
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -102,12 +105,12 @@ func compileTasks() (err error) {
 	return
 }
 
-func runTasks(args []string) (err error) {
+func runTasks(args []string, isDebug bool) (err error) {
 	sourceDir, err := os.Getwd()
 	if err != nil {
 		return
 	}
 
-	err = build.Run(sourceDir, args)
+	err = build.Run(sourceDir, args, isDebug)
 	return
 }
