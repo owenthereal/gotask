@@ -57,7 +57,9 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 		name = filepath.Base(p.Dir)
 	}
 
-	taskSet = &tasking.TaskSet{Name: name, Dir: p.Dir, PkgObj: p.PkgObj, ImportPath: p.ImportPath, Tasks: tasks}
+	importPath = strings.Replace(p.ImportPath, "\\", "/", -1)
+
+	taskSet = &tasking.TaskSet{Name: name, Dir: p.Dir, PkgObj: p.PkgObj, ImportPath: importPath, Tasks: tasks}
 
 	return
 }
@@ -78,7 +80,7 @@ func expandPath(path string) (expanded string, err error) {
 
 func findImportPath(gp, dir string) (importPath string, err error) {
 	var gopaths []string
-  // GOPATHs are separated by ; on Windows
+	// GOPATHs are separated by ; on Windows
 	if runtime.GOOS == "windows" {
 		gopaths = strings.Split(gp, ";")
 	} else {
