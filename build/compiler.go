@@ -140,7 +140,7 @@ func withTempDir(isDebug bool, f func(string) error) (err error) {
 	}
 	defer func() {
 		if isDebug {
-			debugf("not deleting work directory %s", temp)
+			debugf("keeping work directory %s", temp)
 		} else {
 			os.RemoveAll(temp)
 		}
