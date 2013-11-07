@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -76,9 +77,16 @@ func expandPath(path string) (expanded string, err error) {
 }
 
 func findImportPath(gp, dir string) (importPath string, err error) {
-	gopaths := strings.Split(gp, ":")
+	var gopaths []string
+  // GOPATHs are separated by ; on Windows
+	if runtime.GOOS == "windows" {
+		gopaths = strings.Split(gp, ";")
+	} else {
+		gopaths = strings.Split(gp, ":")
+	}
+
 	if len(gopaths) == 0 {
-		err = fmt.Errorf("No environment variable GOPATH found")
+		err = fmt.Errorf("Environment variable GOPATH is not found")
 		return
 	}
 
