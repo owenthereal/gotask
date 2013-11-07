@@ -4,18 +4,24 @@ import (
 	"fmt"
 	"github.com/bmizerany/assert"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
 
 func TestParser_findImportPath(t *testing.T) {
 	gopath := os.Getenv("GOPATH")
-	gopath = fmt.Sprintf("/etc:%s", gopath)
+	if runtime.GOOS == "windows" {
+		gopath = fmt.Sprintf("/etc;%s", gopath)
+	} else {
+		gopath = fmt.Sprintf("/etc:%s", gopath)
+	}
 	dir, _ := expandPath("../examples")
 	importPath, err := findImportPath(gopath, dir)
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, "github.com/jingweno/gotask/examples", importPath)
+	assert.Equal(t, filepath.Join("github.com", "jingweno", "gotask", "examples"), importPath)
 }
 
 func TestParser_Load(t *testing.T) {
@@ -23,7 +29,7 @@ func TestParser_Load(t *testing.T) {
 	ts, err := p.Parse("../examples")
 
 	assert.Equal(t, nil, err)
-	assert.Tf(t, strings.HasSuffix(ts.PkgObj, "github.com/jingweno/gotask/examples.a"), "%s", ts.PkgObj)
+	assert.Tf(t, strings.HasSuffix(ts.PkgObj, filepath.Join("github.com", "jingweno", "gotask", "examples.a")), "%s", ts.PkgObj)
 	assert.Equal(t, "github.com/jingweno/gotask/examples", ts.ImportPath)
 	assert.Equal(t, 2, len(ts.Tasks))
 }
