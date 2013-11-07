@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -92,6 +93,9 @@ func (c *compiler) compileTaskMain(sourceDir, mainFile, outfile string) (exec st
 	// TODO: consider caching build
 	compileCmd := []string{"go", "build", "--tags", "gotask"}
 	if outfile != "" {
+		if runtime.GOOS == "windows" {
+			outfile = fmt.Sprintf("%s.exe", outfile)
+		}
 		exec = outfile
 		compileCmd = append(compileCmd, "-o", outfile)
 	}
