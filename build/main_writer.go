@@ -28,15 +28,15 @@ import (
 
 var tasks = []tasking.Task{
 {{range .Tasks}}
-  {Name: "{{.Name}}", Usage: {{.Usage | printf "%q"}}, Description: {{.Description | printf "%q"}}, Action: _task.{{.ActionName}}},
+  {Name: {{.Name | printf "%q" }}, Usage: {{.Usage | printf "%q"}}, Description: {{.Description | printf "%q"}}, Action: _task.{{.ActionName}}},
 {{end}}
 }
 
 var taskSet = tasking.TaskSet{
-  Name: "{{.Name}}",
-  Dir: "{{.Dir}}",
-  PkgObj: "{{.PkgObj}}",
-  ImportPath: "{{.ImportPath}}",
+  Name: {{.Name | printf "%q" }},
+  Dir: {{.Dir | printf "%q" }},
+  PkgObj: {{.PkgObj | printf "%q" }},
+  ImportPath: {{.ImportPath | printf "%q" }},
   Tasks: tasks,
 }
 
