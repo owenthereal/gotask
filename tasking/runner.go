@@ -7,20 +7,22 @@ import (
 
 func Run(taskSet *TaskSet, args []string) {
 	runner := runner{TaskSet: taskSet}
-	runner.Run(args)
+	err := runner.Run(args)
+	if err != nil {
+		os.Exit(1)
+	}
 }
 
 type runner struct {
 	TaskSet *TaskSet
 }
 
-func (r *runner) Run(args []string) {
+func (r *runner) Run(args []string) error {
 	cmds := convertToCommands(r.TaskSet.Tasks)
 	app := cli.NewApp()
 	app.Name = r.TaskSet.Name
 	app.Commands = cmds
-	app.Run(args)
-	return
+	return app.Run(args)
 }
 
 func convertToCommands(tasks []Task) (cmds []cli.Command) {

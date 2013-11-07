@@ -7,5 +7,8 @@ import (
 
 func main() {
 	app := cli.NewApp()
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	if err != nil {
+		os.Exit(1)
+	}
 }
