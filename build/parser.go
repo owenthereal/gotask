@@ -160,12 +160,18 @@ func parseTasks(filename string) (tasks []tasking.Task, err error) {
 
 		actionName := n.Name.String()
 		if isTask(actionName, "Task") {
-			usage, desc, e := parseUsageAndDesc(n.Doc.Text())
+			m, e := parseManPage(n.Doc.Text())
 			if e != nil {
 				continue
 			}
 
-			name := convertActionNameToTaskName(actionName)
+			name := m["NAME"]
+			usage := m["USAGE"]
+			desc := m["DESCRIPTION"]
+			if name == "" {
+				name = convertActionNameToTaskName(actionName)
+			}
+
 			t := tasking.Task{Name: name, ActionName: actionName, Usage: usage, Description: desc}
 			tasks = append(tasks, t)
 		}
@@ -199,33 +205,61 @@ func convertActionNameToTaskName(s string) string {
 	return dasherize(n)
 }
 
-func parseUsageAndDesc(doc string) (usage, desc string, err error) {
+func parseManPage(doc string) (result map[string]string, err error) {
+	result = make(map[string]string)
+	headingRegexp := regexp.MustCompile(`^([A-Z]+)$`)
 	reader := bufio.NewReader(bytes.NewReader([]byte(doc)))
-	r := regexp.MustCompile("\\S")
-	var usageParts, descParts []string
 
-	line, err := readLine(reader)
+	var (
+		line    string
+		heading string
+		content []string
+	)
 	for err == nil {
-		if len(descParts) == 0 && r.MatchString(line) {
-			usageParts = append(usageParts, line)
-		} else {
-			descParts = append(descParts, line)
-		}
-
 		line, err = readLine(reader)
+
+		if headingRegexp.MatchString(line) {
+			if heading != line {
+				if heading != "" {
+					result[heading] = concatHeadingContent(content)
+				}
+
+				heading = line
+				content = []string{}
+			}
+		} else {
+			if line != "" {
+				line = strings.TrimSpace(line)
+			}
+			content = append(content, line)
+		}
+	}
+	// the last one
+	if heading != "" {
+		result[heading] = concatHeadingContent(content)
 	}
 
 	if err == io.EOF {
 		err = nil
 	}
 
-	usage = strings.Join(usageParts, " ")
-	usage = strings.TrimSpace(usage)
-
-	desc = strings.Join(descParts, "\n")
-	desc = strings.TrimSpace(desc)
+	// set NAME and USAGE
+	if name, ok := result["NAME"]; ok {
+		s := strings.SplitN(name, " - ", 2)
+		if len(s) == 1 {
+			result["NAME"] = ""
+			result["USAGE"] = strings.TrimSpace(s[0])
+		} else {
+			result["NAME"] = strings.TrimSpace(s[0])
+			result["USAGE"] = strings.TrimSpace(s[1])
+		}
+	}
 
 	return
+}
+
+func concatHeadingContent(content []string) string {
+	return strings.TrimSpace(strings.Join(content, "\n   "))
 }
 
 func readLine(r *bufio.Reader) (string, error) {

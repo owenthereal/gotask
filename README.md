@@ -12,6 +12,12 @@ To write build tasks on a Go project in Go instead of Make, Rake or insert your 
 It provides a convention-over-configuration way of writing build tasks in Go.
 `gotask` is heavily inspired by [`go test`](http://golang.org/pkg/testing).
 
+## Installation
+
+```plain
+$ go get -u github.com/jingweno/gotask
+```
+
 ## Defining a Task
 
 Similar to defining a Go test, create a file called `TASK_NAME_task.go` and name the task function in the
@@ -24,30 +30,39 @@ package main
 
 import "github.com/jingweno/gotask/tasking"
 
-// Usage
+// NAME
+//    The name of the task - a one-line description of what it does
 //
-// Description
+// DESCRIPTION
+//    A textual description of the task function
 func TaskXxx(t *tasking.T) {
   ...
 }
 ```
 
-where `Xxx` can be any alphanumeric string (but the first letter must not be in [a-z]) and serves to identify the task routine.
-The comments for the task function will be automatically parsed as the task's usage and help description:
-The first block of the comment is the usage and the rest is the description.
-The `// +build gotask` [build tags](http://golang.org/pkg/go/build/#Context) constraint task functions to `gotask` build.
+where `Xxx` can be any alphanumeric string (but the first letter must not be in [a-z]) and serves to identify the task name.
+
+### Task Name
+
+Without declaring the [task name in the comments](https://github.com/jingweno/gotask/tree/doc_parser#comments-as-man-page),
+`gotask` will dasherize the `Xxx` part of the task function name and use it as the task name.
+
+### Comments as Man Page
+
+The comments for the task function are parsed as the task's man page by following the [man page layout](http://en.wikipedia.org/wiki/Man_page#Layout):
+Section NAME contains the name of the task and a one-line description of what it does, separated by a "-".
+Section DESCRIPTION contains the textual description of the task function.
+
+### Build Tags
+
+The `// +build gotask` [build tag](http://golang.org/pkg/go/build/#Context) constraints task functions to `gotask` build only.
+Without the build tag, task functions will be available to application build which may not be desired.
 
 ## Compiling Tasks
 
 `gotask` is able to compile defined tasks into an executable using `go build`.
 This is useful when you need to distribute your build executables.
 See `gotask -c` for details.
-
-## Installation
-
-```plain
-$ go get -u github.com/jingweno/gotask
-```
 
 ## Examples
 
@@ -64,9 +79,11 @@ import (
 	"os/user"
 )
 
-// Say hello to current user
+// NAME
+//    say-hello - Say hello to current user
 //
-// Print out hello to current user
+// DESCRIPTION
+//    Print out hello to current user
 func TaskSayHello(t *tasking.T) {
 	user, _ := user.Current()
 	fmt.Printf("Hello %s\n", user.Name)
@@ -74,8 +91,7 @@ func TaskSayHello(t *tasking.T) {
 ```
 
 Make sure the build tag `// +build gotask` is the first line of the file and there's an empty line before package definition.
-Without the build tag, task functions will be available to the application build which may not be desired.
-By convention, the `gotask` CLI is able to discover the task and dasherize the task name.
+The comments of the task should be in the format of the [man page layout](http://en.wikipedia.org/wiki/Man_page#Layout).
 Running `gotask -h` displays all the tasks:
 
 ```plain
@@ -87,7 +103,7 @@ USAGE:
    gotask [global options] command [command options] [arguments...]
 
 VERSION:
-   0.0.2
+   0.0.7
 
 COMMANDS:
    say-hello    Say hello to current user
@@ -99,8 +115,8 @@ GLOBAL OPTIONS:
    --help, -h           show help
 ```
 
-Noticing the first block of the comments appears as the task usage for
-`say-hello`, the rest become the description:
+Noticing section NAME of the comments appears as the task name and usage for
+`say-hello`, section DESCRIPTION becomes the description:
 
 ```plain
 $ gotask say-hello -h

@@ -10,13 +10,15 @@ import (
 	"net/http"
 )
 
-// Get URL for a given GitHub user login
+// NAME
+//    git-hub-user - Get URL for a given GitHub user login
 //
-// Given a GitHub user login, call the GitHub API
-// to get this user and print out the user page URL.
-// For example
+// DESCRIPTION
+//    Given a GitHub user login, call the GitHub API to get this user and print out the user page URL.
 //
-// $ gotask git-hub-user jingweno
+//    For example
+//
+//    $ gotask git-hub-user jingweno
 func TaskGitHubUser(t *tasking.T) {
 	if len(t.Args) == 0 {
 		t.Error("No GitHub user login is provided!")
