@@ -46,22 +46,37 @@ func TestParser_parseTasks(t *testing.T) {
 	tasks, _ := parseTasks("../examples/say_hello_task.go")
 
 	assert.Equal(t, 1, len(tasks))
-	assert.Equal(t, "say-hello", tasks[0].Name)
 	assert.Equal(t, "TaskSayHello", tasks[0].ActionName)
+	assert.Equal(t, "say-hello", tasks[0].Name)
 	assert.Equal(t, "Say hello to current user", tasks[0].Usage)
 	assert.Equal(t, "Print out hello to current user", tasks[0].Description)
 }
 
-func TestParseUsageAndDesc(t *testing.T) {
-	doc := `Usage
+func TestParseManPage(t *testing.T) {
+	doc := `NAME
+    say-hello - Say hello to current user
 
-Desc
+DESCRIPTION
+    Print out hello to current user
+    one more line
 
-Desc2
 `
-	usage, desc, err := parseUsageAndDesc(doc)
+	result, err := parseManPage(doc)
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, "Usage", usage)
-	assert.Equal(t, "Desc\n\nDesc2", desc)
+	assert.Equal(t, 3, len(result))
+	assert.Equal(t, "say-hello", result["NAME"])
+	assert.Equal(t, "Say hello to current user", result["USAGE"])
+	assert.Equal(t, "Print out hello to current user\n   one more line", result["DESCRIPTION"])
+
+	doc = `Name
+    say-hello - Say hello to current user
+
+Description
+    Print out hello to current user
+`
+	result, err = parseManPage(doc)
+
+	assert.Equal(t, nil, err)
+	assert.Equal(t, 0, len(result))
 }
