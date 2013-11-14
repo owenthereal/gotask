@@ -44,7 +44,7 @@ where `Xxx` can be any alphanumeric string (but the first letter must not be in 
 
 ### Task Name
 
-Without declaring the [task name in the comments](https://github.com/jingweno/gotask/tree/doc_parser#comments-as-man-page),
+Without declaring the [task name in the comments](https://github.com/jingweno/gotask#comments-as-man-page),
 `gotask` will dasherize the `Xxx` part of the task function name and use it as the task name.
 
 ### Comments as Man Page
