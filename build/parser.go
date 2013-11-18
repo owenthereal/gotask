@@ -1,18 +1,14 @@
 package build
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"github.com/jingweno/gotask/tasking"
 	"go/ast"
 	"go/build"
 	goparser "go/parser"
 	"go/token"
-	"io"
 	"os"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strings"
 	"unicode"
@@ -160,7 +156,8 @@ func parseTasks(filename string) (tasks []tasking.Task, err error) {
 
 		actionName := n.Name.String()
 		if isTask(actionName, "Task") {
-			mp, e := parseManPage(n.Doc.Text())
+			p := &manPageParser{n.Doc.Text()}
+			mp, e := p.Parse()
 			if e != nil {
 				continue
 			}
@@ -200,78 +197,4 @@ func isTask(name, prefix string) bool {
 func convertActionNameToTaskName(s string) string {
 	n := strings.TrimPrefix(s, "Task")
 	return dasherize(n)
-}
-
-func parseManPage(doc string) (mp *manPage, err error) {
-	mp = &manPage{}
-	result := make(map[string]string)
-	headingRegexp := regexp.MustCompile(`^([A-Z]+)$`)
-	reader := bufio.NewReader(bytes.NewReader([]byte(doc)))
-
-	var (
-		line    string
-		heading string
-		content []string
-	)
-	for err == nil {
-		line, err = readLine(reader)
-
-		if headingRegexp.MatchString(line) {
-			if heading != line {
-				if heading != "" {
-					result[heading] = concatHeadingContent(content)
-				}
-
-				heading = line
-				content = []string{}
-			}
-		} else {
-			if line != "" {
-				line = strings.TrimSpace(line)
-			}
-			content = append(content, line)
-		}
-	}
-	// the last one
-	if heading != "" {
-		result[heading] = concatHeadingContent(content)
-	}
-
-	if err == io.EOF {
-		err = nil
-	}
-
-	// set NAME and USAGE
-	if name, ok := result["NAME"]; ok {
-		s := strings.SplitN(name, " - ", 2)
-		if len(s) == 1 {
-			mp.Name = ""
-			mp.Usage = strings.TrimSpace(s[0])
-		} else {
-			mp.Name = strings.TrimSpace(s[0])
-			mp.Usage = strings.TrimSpace(s[1])
-		}
-	}
-	mp.Description = result["DESCRIPTION"]
-
-	return
-}
-
-func concatHeadingContent(content []string) string {
-	return strings.TrimSpace(strings.Join(content, "\n   "))
-}
-
-func readLine(r *bufio.Reader) (string, error) {
-	var (
-		isPrefix = true
-		err      error
-		line, ln []byte
-	)
-
-	for isPrefix && err == nil {
-		line, isPrefix, err = r.ReadLine()
-		ln = append(ln, line...)
-	}
-
-	return string(ln), err
 }
