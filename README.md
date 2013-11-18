@@ -64,6 +64,17 @@ Without the build tag, task functions will be available to application build whi
 This is useful when you need to distribute your build executables.
 See `gotask -c` for details.
 
+## Task Scaffold
+
+`gotask` is able to generate a task scaffold named `pkg_task.go` with the `--generate` or `-g` flag.
+`pkg` is the name of the package where `gotask` is run:
+
+```plain
+// in a folder where package example is defined
+$ gotask -g
+create example_task.go
+```
+
 ## Examples
 
 On a [Go project](http://golang.org/doc/code.html#Organization), create a file called `say_hello_task.go` with the following content:
@@ -103,14 +114,16 @@ USAGE:
    gotask [global options] command [command options] [arguments...]
 
 VERSION:
-   0.0.7
+   0.8.0
 
-COMMANDS:
+OMMANDS:
    say-hello    Say hello to current user
    help, h      Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
+   --generate, -g       generate a task scaffold named pkg_task.go
    --compile, -c        compile the task binary to pkg.task but do not run it
+   --debug              run in debug mode
    --version            print the version
    --help, -h           show help
 ```
@@ -130,6 +143,7 @@ DESCRIPTION:
    Print out hello to current user
 
 OPTIONS:
+   --debug      run in debug mode
 ```
 
 To execute the task, type:

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/jingweno/gotask/build"
 	"log"
@@ -21,14 +22,16 @@ func NewApp() *cli.App {
 	app.Version = Version
 	app.Commands = cmds
 	app.Flags = []cli.Flag{
-		newFlag{Usage: "create an example task file named pkg_task.go"},
+		generateFlag{Usage: "generate a task scaffold named pkg_task.go"},
 		compileFlag{Usage: "compile the task binary to pkg.task but do not run it"},
 		debugFlag,
 	}
 	app.Action = func(c *cli.Context) {
-		if c.Bool("n") || c.Bool("new") {
-			err := generateNewTask()
-			if err != nil {
+		if c.Bool("g") || c.Bool("generate") {
+			fileName, err := generateNewTask()
+			if err == nil {
+				fmt.Printf("create %s\n", fileName)
+			} else {
 				log.Fatal(err)
 			}
 
