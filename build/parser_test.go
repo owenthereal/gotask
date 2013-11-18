@@ -61,13 +61,12 @@ DESCRIPTION
     one more line
 
 `
-	result, err := parseManPage(doc)
+	mp, err := parseManPage(doc)
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, 3, len(result))
-	assert.Equal(t, "say-hello", result["NAME"])
-	assert.Equal(t, "Say hello to current user", result["USAGE"])
-	assert.Equal(t, "Print out hello to current user\n   one more line", result["DESCRIPTION"])
+	assert.Equal(t, "say-hello", mp.Name)
+	assert.Equal(t, "Say hello to current user", mp.Usage)
+	assert.Equal(t, "Print out hello to current user\n   one more line", mp.Description)
 
 	doc = `Name
     say-hello - Say hello to current user
@@ -75,8 +74,10 @@ DESCRIPTION
 Description
     Print out hello to current user
 `
-	result, err = parseManPage(doc)
+	mp, err = parseManPage(doc)
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, 0, len(result))
+	assert.Equal(t, "", mp.Name)
+	assert.Equal(t, "", mp.Usage)
+	assert.Equal(t, "", mp.Description)
 }

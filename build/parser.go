@@ -160,19 +160,16 @@ func parseTasks(filename string) (tasks []tasking.Task, err error) {
 
 		actionName := n.Name.String()
 		if isTask(actionName, "Task") {
-			m, e := parseManPage(n.Doc.Text())
+			mp, e := parseManPage(n.Doc.Text())
 			if e != nil {
 				continue
 			}
 
-			name := m["NAME"]
-			usage := m["USAGE"]
-			desc := m["DESCRIPTION"]
-			if name == "" {
-				name = convertActionNameToTaskName(actionName)
+			if mp.Name == "" {
+				mp.Name = convertActionNameToTaskName(actionName)
 			}
 
-			t := tasking.Task{Name: name, ActionName: actionName, Usage: usage, Description: desc}
+			t := tasking.Task{Name: mp.Name, ActionName: actionName, Usage: mp.Usage, Description: mp.Description}
 			tasks = append(tasks, t)
 		}
 	}
@@ -205,8 +202,9 @@ func convertActionNameToTaskName(s string) string {
 	return dasherize(n)
 }
 
-func parseManPage(doc string) (result map[string]string, err error) {
-	result = make(map[string]string)
+func parseManPage(doc string) (mp *manPage, err error) {
+	mp = &manPage{}
+	result := make(map[string]string)
 	headingRegexp := regexp.MustCompile(`^([A-Z]+)$`)
 	reader := bufio.NewReader(bytes.NewReader([]byte(doc)))
 
@@ -247,13 +245,14 @@ func parseManPage(doc string) (result map[string]string, err error) {
 	if name, ok := result["NAME"]; ok {
 		s := strings.SplitN(name, " - ", 2)
 		if len(s) == 1 {
-			result["NAME"] = ""
-			result["USAGE"] = strings.TrimSpace(s[0])
+			mp.Name = ""
+			mp.Usage = strings.TrimSpace(s[0])
 		} else {
-			result["NAME"] = strings.TrimSpace(s[0])
-			result["USAGE"] = strings.TrimSpace(s[1])
+			mp.Name = strings.TrimSpace(s[0])
+			mp.Usage = strings.TrimSpace(s[1])
 		}
 	}
+	mp.Description = result["DESCRIPTION"]
 
 	return
 }
