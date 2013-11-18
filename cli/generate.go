@@ -28,7 +28,7 @@ func generateNewTask() (fileName string, err error) {
 
 	pkgName := filepath.Base(sourceDir)
 	fileName = fmt.Sprintf("%s_task.go", pkgName)
-  outfile := filepath.Join(sourceDir, fileName)
+	outfile := filepath.Join(sourceDir, fileName)
 	f, err := os.Create(outfile)
 	if err != nil {
 		return
