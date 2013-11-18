@@ -1,29 +1,13 @@
 package cli
 
 import (
-	"flag"
-	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/jingweno/gotask/build"
 	"log"
 	"os"
-	"path/filepath"
 )
 
 var debugFlag = cli.BoolFlag{"debug", "run in debug mode"}
-
-type compileFlag struct {
-	Usage string
-}
-
-func (f compileFlag) String() string {
-	return fmt.Sprintf("--compile, -c\t%v", f.Usage)
-}
-
-func (f compileFlag) Apply(set *flag.FlagSet) {
-	set.Bool("c", false, f.Usage)
-	set.Bool("compile", false, f.Usage)
-}
 
 func NewApp() *cli.App {
 	cmds, err := parseCommands()
@@ -37,10 +21,20 @@ func NewApp() *cli.App {
 	app.Version = Version
 	app.Commands = cmds
 	app.Flags = []cli.Flag{
+		newFlag{Usage: "create an example task file named pkg_task.go"},
 		compileFlag{Usage: "compile the task binary to pkg.task but do not run it"},
 		debugFlag,
 	}
 	app.Action = func(c *cli.Context) {
+		if c.Bool("n") || c.Bool("new") {
+			err := generateNewTask()
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			return
+		}
+
 		if c.Bool("c") || c.Bool("compile") {
 			err := compileTasks(c.Bool("debug"))
 			if err != nil {
@@ -92,19 +86,6 @@ func parseCommands() (cmds []cli.Command, err error) {
 		cmds = append(cmds, cmd)
 	}
 
-	return
-}
-
-func compileTasks(isDebug bool) (err error) {
-	sourceDir, err := os.Getwd()
-	if err != nil {
-		return
-	}
-
-	fileName := fmt.Sprintf("%s.task", filepath.Base(sourceDir))
-	outfile := filepath.Join(sourceDir, fileName)
-
-	err = build.Compile(sourceDir, outfile, isDebug)
 	return
 }
 
