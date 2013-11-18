@@ -19,8 +19,22 @@ type manPageParser struct {
 }
 
 func (p *manPageParser) Parse() (mp *manPage, err error) {
+	sections, err := p.readSections()
+	if err != nil {
+		return
+	}
+
 	mp = &manPage{}
-	result := make(map[string]string)
+	if nameAndUsage, ok := sections["NAME"]; ok {
+		mp.Name, mp.Usage = p.splitNameAndUsage(nameAndUsage)
+	}
+	mp.Description = sections["DESCRIPTION"]
+
+	return
+}
+
+func (p *manPageParser) readSections() (sections map[string]string, err error) {
+	sections = make(map[string]string)
 	headingRegexp := regexp.MustCompile(`^([A-Z]+)$`)
 	reader := bufio.NewReader(bytes.NewReader([]byte(p.Doc)))
 
@@ -35,7 +49,7 @@ func (p *manPageParser) Parse() (mp *manPage, err error) {
 		if headingRegexp.MatchString(line) {
 			if heading != line {
 				if heading != "" {
-					result[heading] = concatHeadingContent(content)
+					sections[heading] = concatHeadingContent(content)
 				}
 
 				heading = line
@@ -50,25 +64,25 @@ func (p *manPageParser) Parse() (mp *manPage, err error) {
 	}
 	// the last one
 	if heading != "" {
-		result[heading] = concatHeadingContent(content)
+		sections[heading] = concatHeadingContent(content)
 	}
 
 	if err == io.EOF {
 		err = nil
 	}
 
-	// set NAME and USAGE
-	if name, ok := result["NAME"]; ok {
-		s := strings.SplitN(name, " - ", 2)
-		if len(s) == 1 {
-			mp.Name = ""
-			mp.Usage = strings.TrimSpace(s[0])
-		} else {
-			mp.Name = strings.TrimSpace(s[0])
-			mp.Usage = strings.TrimSpace(s[1])
-		}
+	return
+}
+
+func (p *manPageParser) splitNameAndUsage(nameAndUsage string) (name, usage string) {
+	s := strings.SplitN(nameAndUsage, " - ", 2)
+	if len(s) == 1 {
+		name = ""
+		usage = strings.TrimSpace(s[0])
+	} else {
+		name = strings.TrimSpace(s[0])
+		usage = strings.TrimSpace(s[1])
 	}
-	mp.Description = result["DESCRIPTION"]
 
 	return
 }
