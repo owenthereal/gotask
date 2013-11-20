@@ -55,7 +55,13 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 
 	importPath = strings.Replace(p.ImportPath, "\\", "/", -1)
 
-	taskSet = &tasking.TaskSet{Name: name, Dir: p.Dir, PkgObj: p.PkgObj, ImportPath: importPath, Tasks: tasks}
+	taskSet = &tasking.TaskSet{
+		Name:       name,
+		Dir:        p.Dir,
+		PkgObj:     p.PkgObj,
+		ImportPath: importPath,
+		Tasks:      tasks,
+	}
 
 	return
 }

@@ -32,32 +32,38 @@ func (t *T) Exec(cmd ...string) (err error) {
 	return
 }
 
-func (t *T) fail() {
+// Fail marks the task as having failed but continues execution.
+func (t *T) Fail() {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.failed = true
 }
 
+// Check if the task has failed
 func (t *T) Failed() bool {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	return t.failed
 }
 
+// Log formats its arguments using default formatting, analogous to Println.
 func (t *T) Log(args ...interface{}) {
 	fmt.Println(args...)
 }
 
+// Logf formats its arguments according to the format, analogous to Printf.
 func (t *T) Logf(format string, args ...interface{}) {
 	fmt.Printf(format, args...)
 }
 
+// Error is equivalent to Log followed by Fail.
 func (t *T) Error(args ...interface{}) {
 	fmt.Fprintln(os.Stderr, args...)
-	t.fail()
+	t.Fail()
 }
 
+// Errorf is equivalent to Logf followed by Fail.
 func (t *T) Errorf(format string, args ...interface{}) {
 	fmt.Fprintf(os.Stderr, format, args...)
-	t.fail()
+	t.Fail()
 }
