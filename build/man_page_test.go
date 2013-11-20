@@ -2,6 +2,7 @@ package build
 
 import (
 	"github.com/bmizerany/assert"
+	"github.com/jingweno/gotask/tasking"
 	"testing"
 )
 
@@ -13,6 +14,9 @@ DESCRIPTION
     Print out hello to current user
     one more line
 
+OPTIONS
+    -v, --verbose
+        Run in verbose mode
 `
 	p := &manPageParser{doc}
 	mp, err := p.Parse()
@@ -21,6 +25,12 @@ DESCRIPTION
 	assert.Equal(t, "say-hello", mp.Name)
 	assert.Equal(t, "Say hello to current user", mp.Usage)
 	assert.Equal(t, "Print out hello to current user\n   one more line", mp.Description)
+	assert.Equal(t, 1, len(mp.Flags))
+
+	firstFlag, ok := mp.Flags[0].(tasking.BoolFlag)
+	assert.Tf(t, ok, "Can't convert flag to tasking.BoolFlag")
+	assert.Equal(t, "-v, --verbose", firstFlag.Name)
+	assert.Equal(t, "Run in verbose mode", firstFlag.Usage)
 
 	doc = `Name
     say-hello - Say hello to current user
@@ -35,4 +45,5 @@ Description
 	assert.Equal(t, "", mp.Name)
 	assert.Equal(t, "", mp.Usage)
 	assert.Equal(t, "", mp.Description)
+	assert.Equal(t, 0, len(mp.Flags))
 }

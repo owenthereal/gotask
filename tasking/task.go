@@ -1,11 +1,10 @@
 package tasking
 
 import (
+	"flag"
 	"fmt"
-	"github.com/kballard/go-shellquote"
-	"os"
+	"github.com/codegangsta/cli"
 	"strings"
-	"sync"
 )
 
 type TaskSet struct {
@@ -24,60 +23,43 @@ type Task struct {
 	Name        string
 	Usage       string
 	Description string
+	Flags       []Flag
 	ActionName  string
 	Action      func(*T)
 }
 
-type T struct {
-	mu     sync.RWMutex
-	Args   []string
-	output []string
-	failed bool
-}
-
-// Run the system command. If multiple arguments are given, they're concatenated to one command.
-//
-// Example:
-//   t.Exec("ls -ltr")
-//   t.Exec("ls", FILE1, FILE2)
-func (t *T) Exec(cmd ...string) (err error) {
-	toRun := strings.Join(cmd, " ")
-	input, err := shellquote.Split(toRun)
-	if err != nil {
-		return
+func (t *Task) toCLIFlags() (flags []cli.Flag) {
+	for _, flag := range t.Flags {
+		flags = append(flags, flag)
 	}
-
-	err = execCmd(input)
 
 	return
 }
 
-func (t *T) fail() {
-	t.mu.Lock()
-	defer t.mu.Unlock()
-	t.failed = true
+type Flag interface {
+	fmt.Stringer
+	Apply(*flag.FlagSet)
 }
 
-func (t *T) Failed() bool {
-	t.mu.Lock()
-	defer t.mu.Unlock()
-	return t.failed
+type BoolFlag struct {
+	Name  string
+	Usage string
 }
 
-func (t *T) Log(args ...interface{}) {
-	fmt.Println(args...)
+func (f BoolFlag) String() string {
+	return fmt.Sprintf("%s\t%v", f.Name, f.Usage)
 }
 
-func (t *T) Logf(format string, args ...interface{}) {
-	fmt.Printf(format, args...)
+func (f BoolFlag) Apply(set *flag.FlagSet) {
+	for _, name := range f.splitName() {
+		set.Bool(name, false, f.Usage)
+	}
 }
 
-func (t *T) Error(args ...interface{}) {
-	fmt.Fprintln(os.Stderr, args...)
-	t.fail()
-}
+func (f BoolFlag) splitName() (names []string) {
+	for _, name := range strings.Split(f.Name, ",") {
+		names = append(names, strings.TrimSpace(name))
+	}
 
-func (t *T) Errorf(format string, args ...interface{}) {
-	fmt.Fprintf(os.Stderr, format, args...)
-	t.fail()
+	return
 }

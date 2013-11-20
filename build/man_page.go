@@ -3,6 +3,7 @@ package build
 import (
 	"bufio"
 	"bytes"
+	"github.com/jingweno/gotask/tasking"
 	"io"
 	"regexp"
 	"strings"
@@ -12,6 +13,7 @@ type manPage struct {
 	Name        string
 	Usage       string
 	Description string
+	Flags       []tasking.Flag
 }
 
 type manPageParser struct {
@@ -25,6 +27,12 @@ func (p *manPageParser) Parse() (mp *manPage, err error) {
 	}
 
 	mp = &manPage{}
+	if opts, ok := sections["OPTIONS"]; ok {
+		mp.Flags, err = p.parseFlags(opts)
+		if err != nil {
+			return
+		}
+	}
 	if nameAndUsage, ok := sections["NAME"]; ok {
 		mp.Name, mp.Usage = p.splitNameAndUsage(nameAndUsage)
 	}
@@ -87,8 +95,50 @@ func (p *manPageParser) splitNameAndUsage(nameAndUsage string) (name, usage stri
 	return
 }
 
+func (p *manPageParser) parseFlags(optsStr string) (flags []tasking.Flag, err error) {
+	reader := bufio.NewReader(bytes.NewReader([]byte(optsStr)))
+	flagRegexp := regexp.MustCompile(`(\-?\-\w+,?)+`)
+	var (
+		line, name string
+		content    []string
+	)
+
+	for err == nil {
+		line, err = readLine(reader)
+		if flagRegexp.MatchString(line) {
+			if name != line {
+				if name != "" {
+					flags = append(flags, tasking.BoolFlag{Name: name, Usage: concatFlagContent(content)})
+				}
+
+				name = line
+				content = []string{}
+			}
+		} else {
+			if line != "" {
+				line = strings.TrimSpace(line)
+			}
+			content = append(content, line)
+		}
+	}
+	// the last one
+	if name != "" {
+		flags = append(flags, tasking.BoolFlag{Name: name, Usage: concatFlagContent(content)})
+	}
+
+	if err == io.EOF {
+		err = nil
+	}
+
+	return
+}
+
 func concatHeadingContent(content []string) string {
 	return strings.TrimSpace(strings.Join(content, "\n   "))
+}
+
+func concatFlagContent(content []string) string {
+	return strings.TrimSpace(strings.Join(content, "\n"))
 }
 
 func readLine(r *bufio.Reader) (string, error) {
