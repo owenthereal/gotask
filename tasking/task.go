@@ -28,7 +28,7 @@ type Task struct {
 	Action      func(*T)
 }
 
-func (t *Task) toCLIFlags() (flags []cli.Flag) {
+func (t *Task) ToCLIFlags() (flags []cli.Flag) {
 	for _, flag := range t.Flags {
 		flags = append(flags, flag)
 	}
@@ -39,6 +39,7 @@ func (t *Task) toCLIFlags() (flags []cli.Flag) {
 type Flag interface {
 	fmt.Stringer
 	Apply(*flag.FlagSet)
+	DefType(importAsPkg string) string
 }
 
 type BoolFlag struct {
@@ -47,13 +48,17 @@ type BoolFlag struct {
 }
 
 func (f BoolFlag) String() string {
-	return fmt.Sprintf("%s\t%v", f.Name, f.Usage)
+	return fmt.Sprintf("%s\t%v", strings.Join(f.splitName(), ", "), f.Usage)
 }
 
 func (f BoolFlag) Apply(set *flag.FlagSet) {
 	for _, name := range f.splitName() {
-		set.Bool(name, false, f.Usage)
+		set.Bool(strings.TrimLeft(name, "-"), false, f.Usage)
 	}
+}
+
+func (f BoolFlag) DefType(importAsPkg string) string {
+	return fmt.Sprintf(`%s.BoolFlag{Name: "%s", Usage: "%s"}`, importAsPkg, f.Name, f.Usage)
 }
 
 func (f BoolFlag) splitName() (names []string) {

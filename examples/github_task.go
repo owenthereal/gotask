@@ -11,7 +11,7 @@ import (
 )
 
 // NAME
-//    git-hub-user - Get URL for a given GitHub user login
+//    gh-user - Get URL for a given GitHub user login
 //
 // DESCRIPTION
 //    Given a GitHub user login, call the GitHub API to get this user and print out the user page URL.
@@ -19,6 +19,10 @@ import (
 //    For example
 //
 //    $ gotask git-hub-user jingweno
+//
+// OPTIONS
+//    --verbose, -v
+//        run in verbose mode
 func TaskGitHubUser(t *tasking.T) {
 	if len(t.Args) == 0 {
 		t.Error("No GitHub user login is provided!")
@@ -26,7 +30,7 @@ func TaskGitHubUser(t *tasking.T) {
 	}
 
 	login := t.Args[0]
-	data, err := getGitHubUser(login)
+	data, err := fetchGitHubUser(login)
 	if err != nil {
 		t.Error(err)
 		return
@@ -41,7 +45,7 @@ func TaskGitHubUser(t *tasking.T) {
 	t.Logf("The URL for user %s is %s\n", login, url)
 }
 
-func getGitHubUser(login string) (data map[string]interface{}, err error) {
+func fetchGitHubUser(login string) (data map[string]interface{}, err error) {
 	url := fmt.Sprintf("https://api.github.com/users/%s", login)
 	res, err := http.Get(url)
 	if err != nil {

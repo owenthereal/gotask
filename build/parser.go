@@ -166,7 +166,7 @@ func parseTasks(filename string) (tasks []tasking.Task, err error) {
 				mp.Name = convertActionNameToTaskName(actionName)
 			}
 
-			t := tasking.Task{Name: mp.Name, ActionName: actionName, Usage: mp.Usage, Description: mp.Description}
+			t := tasking.Task{Name: mp.Name, ActionName: actionName, Usage: mp.Usage, Description: mp.Description, Flags: mp.Flags}
 			tasks = append(tasks, t)
 		}
 	}

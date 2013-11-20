@@ -32,7 +32,7 @@ func convertToCommands(tasks []Task) (cmds []cli.Command) {
 			Name:        task.Name,
 			Usage:       task.Usage,
 			Description: task.Description,
-			Flags:       task.toCLIFlags(),
+			Flags:       task.ToCLIFlags(),
 			Action: func(c *cli.Context) {
 				runTask(task, c.Args())
 			},
