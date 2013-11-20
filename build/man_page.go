@@ -28,7 +28,7 @@ func (p *manPageParser) Parse() (mp *manPage, err error) {
 
 	mp = &manPage{}
 	if opts, ok := sections["OPTIONS"]; ok {
-		mp.Flags, err = p.parseFlags(opts)
+		mp.Flags, err = p.parseOptions(opts)
 		if err != nil {
 			return
 		}
@@ -57,7 +57,7 @@ func (p *manPageParser) readSections() (sections map[string]string, err error) {
 		if headingRegexp.MatchString(line) {
 			if heading != line {
 				if heading != "" {
-					sections[heading] = concatHeadingContent(content)
+					sections[heading] = concatSectionContent(content)
 				}
 
 				heading = line
@@ -72,7 +72,7 @@ func (p *manPageParser) readSections() (sections map[string]string, err error) {
 	}
 	// the last one
 	if heading != "" {
-		sections[heading] = concatHeadingContent(content)
+		sections[heading] = concatSectionContent(content)
 	}
 
 	if err == io.EOF {
@@ -95,14 +95,14 @@ func (p *manPageParser) splitNameAndUsage(nameAndUsage string) (name, usage stri
 	return
 }
 
-func (p *manPageParser) parseFlags(optsStr string) (flags []tasking.Flag, err error) {
+func (p *manPageParser) parseOptions(optsStr string) (flags []tasking.Flag, err error) {
 	reader := bufio.NewReader(bytes.NewReader([]byte(optsStr)))
 	flagRegexp := regexp.MustCompile(`(\-?\-\w+,?)+`)
+
 	var (
 		line, name string
 		content    []string
 	)
-
 	for err == nil {
 		line, err = readLine(reader)
 		if flagRegexp.MatchString(line) {
@@ -133,7 +133,7 @@ func (p *manPageParser) parseFlags(optsStr string) (flags []tasking.Flag, err er
 	return
 }
 
-func concatHeadingContent(content []string) string {
+func concatSectionContent(content []string) string {
 	return strings.TrimSpace(strings.Join(content, "\n   "))
 }
 
