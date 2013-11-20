@@ -1,18 +1,14 @@
 package build
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"github.com/jingweno/gotask/tasking"
 	"go/ast"
 	"go/build"
 	goparser "go/parser"
 	"go/token"
-	"io"
 	"os"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strings"
 	"unicode"
@@ -59,7 +55,13 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 
 	importPath = strings.Replace(p.ImportPath, "\\", "/", -1)
 
-	taskSet = &tasking.TaskSet{Name: name, Dir: p.Dir, PkgObj: p.PkgObj, ImportPath: importPath, Tasks: tasks}
+	taskSet = &tasking.TaskSet{
+		Name:       name,
+		Dir:        p.Dir,
+		PkgObj:     p.PkgObj,
+		ImportPath: importPath,
+		Tasks:      tasks,
+	}
 
 	return
 }
@@ -160,19 +162,17 @@ func parseTasks(filename string) (tasks []tasking.Task, err error) {
 
 		actionName := n.Name.String()
 		if isTask(actionName, "Task") {
-			m, e := parseManPage(n.Doc.Text())
+			p := &manPageParser{n.Doc.Text()}
+			mp, e := p.Parse()
 			if e != nil {
 				continue
 			}
 
-			name := m["NAME"]
-			usage := m["USAGE"]
-			desc := m["DESCRIPTION"]
-			if name == "" {
-				name = convertActionNameToTaskName(actionName)
+			if mp.Name == "" {
+				mp.Name = convertActionNameToTaskName(actionName)
 			}
 
-			t := tasking.Task{Name: name, ActionName: actionName, Usage: usage, Description: desc}
+			t := tasking.Task{Name: mp.Name, ActionName: actionName, Usage: mp.Usage, Description: mp.Description, Flags: mp.Flags}
 			tasks = append(tasks, t)
 		}
 	}
@@ -203,76 +203,4 @@ func isTask(name, prefix string) bool {
 func convertActionNameToTaskName(s string) string {
 	n := strings.TrimPrefix(s, "Task")
 	return dasherize(n)
-}
-
-func parseManPage(doc string) (result map[string]string, err error) {
-	result = make(map[string]string)
-	headingRegexp := regexp.MustCompile(`^([A-Z]+)$`)
-	reader := bufio.NewReader(bytes.NewReader([]byte(doc)))
-
-	var (
-		line    string
-		heading string
-		content []string
-	)
-	for err == nil {
-		line, err = readLine(reader)
-
-		if headingRegexp.MatchString(line) {
-			if heading != line {
-				if heading != "" {
-					result[heading] = concatHeadingContent(content)
-				}
-
-				heading = line
-				content = []string{}
-			}
-		} else {
-			if line != "" {
-				line = strings.TrimSpace(line)
-			}
-			content = append(content, line)
-		}
-	}
-	// the last one
-	if heading != "" {
-		result[heading] = concatHeadingContent(content)
-	}
-
-	if err == io.EOF {
-		err = nil
-	}
-
-	// set NAME and USAGE
-	if name, ok := result["NAME"]; ok {
-		s := strings.SplitN(name, " - ", 2)
-		if len(s) == 1 {
-			result["NAME"] = ""
-			result["USAGE"] = strings.TrimSpace(s[0])
-		} else {
-			result["NAME"] = strings.TrimSpace(s[0])
-			result["USAGE"] = strings.TrimSpace(s[1])
-		}
-	}
-
-	return
-}
-
-func concatHeadingContent(content []string) string {
-	return strings.TrimSpace(strings.Join(content, "\n   "))
-}
-
-func readLine(r *bufio.Reader) (string, error) {
-	var (
-		isPrefix = true
-		err      error
-		line, ln []byte
-	)
-
-	for isPrefix && err == nil {
-		line, isPrefix, err = r.ReadLine()
-		ln = append(ln, line...)
-	}
-
-	return string(ln), err
 }

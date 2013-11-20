@@ -28,7 +28,17 @@ import (
 
 var tasks = []tasking.Task{
 {{range .Tasks}}
-  {Name: {{.Name | printf "%q" }}, Usage: {{.Usage | printf "%q"}}, Description: {{.Description | printf "%q"}}, Action: _task.{{.ActionName}}},
+  {
+    Name: {{.Name | printf "%q" }},
+    Usage: {{.Usage | printf "%q"}},
+    Description: {{.Description | printf "%q"}},
+    Action: _task.{{.ActionName}},
+    Flags: []tasking.Flag{
+      {{range .Flags}}
+        {{.DefType "tasking"}},
+      {{end}}
+    },
+  },
 {{end}}
 }
 
