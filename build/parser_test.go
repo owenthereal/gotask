@@ -51,32 +51,3 @@ func TestParser_parseTasks(t *testing.T) {
 	assert.Equal(t, "Say hello to current user", tasks[0].Usage)
 	assert.Equal(t, "Print out hello to current user", tasks[0].Description)
 }
-
-func TestParseManPage(t *testing.T) {
-	doc := `NAME
-    say-hello - Say hello to current user
-
-DESCRIPTION
-    Print out hello to current user
-    one more line
-
-`
-	result, err := parseManPage(doc)
-
-	assert.Equal(t, nil, err)
-	assert.Equal(t, 3, len(result))
-	assert.Equal(t, "say-hello", result["NAME"])
-	assert.Equal(t, "Say hello to current user", result["USAGE"])
-	assert.Equal(t, "Print out hello to current user\n   one more line", result["DESCRIPTION"])
-
-	doc = `Name
-    say-hello - Say hello to current user
-
-Description
-    Print out hello to current user
-`
-	result, err = parseManPage(doc)
-
-	assert.Equal(t, nil, err)
-	assert.Equal(t, 0, len(result))
-}

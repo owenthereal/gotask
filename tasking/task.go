@@ -1,11 +1,10 @@
 package tasking
 
 import (
+	"flag"
 	"fmt"
-	"github.com/kballard/go-shellquote"
-	"os"
+	"github.com/codegangsta/cli"
 	"strings"
-	"sync"
 )
 
 type TaskSet struct {
@@ -24,60 +23,56 @@ type Task struct {
 	Name        string
 	Usage       string
 	Description string
+	Flags       []Flag
 	ActionName  string
 	Action      func(*T)
 }
 
-type T struct {
-	mu     sync.RWMutex
-	Args   []string
-	output []string
-	failed bool
-}
-
-// Run the system command. If multiple arguments are given, they're concatenated to one command.
-//
-// Example:
-//   t.Exec("ls -ltr")
-//   t.Exec("ls", FILE1, FILE2)
-func (t *T) Exec(cmd ...string) (err error) {
-	toRun := strings.Join(cmd, " ")
-	input, err := shellquote.Split(toRun)
-	if err != nil {
-		return
+func (t *Task) ToCLIFlags() (flags []cli.Flag) {
+	for _, flag := range t.Flags {
+		flags = append(flags, flag)
 	}
-
-	err = execCmd(input)
 
 	return
 }
 
-func (t *T) fail() {
-	t.mu.Lock()
-	defer t.mu.Unlock()
-	t.failed = true
+type Flags struct {
+	context *cli.Context
 }
 
-func (t *T) Failed() bool {
-	t.mu.Lock()
-	defer t.mu.Unlock()
-	return t.failed
+func (f Flags) Bool(name string) bool {
+	return f.context.Bool(name)
 }
 
-func (t *T) Log(args ...interface{}) {
-	fmt.Println(args...)
+type Flag interface {
+	fmt.Stringer
+	Apply(*flag.FlagSet)
+	DefType(importAsPkg string) string
 }
 
-func (t *T) Logf(format string, args ...interface{}) {
-	fmt.Printf(format, args...)
+type BoolFlag struct {
+	Name  string
+	Usage string
 }
 
-func (t *T) Error(args ...interface{}) {
-	fmt.Fprintln(os.Stderr, args...)
-	t.fail()
+func (f BoolFlag) String() string {
+	return fmt.Sprintf("%s\t%v", strings.Join(f.splitName(), ", "), f.Usage)
 }
 
-func (t *T) Errorf(format string, args ...interface{}) {
-	fmt.Fprintf(os.Stderr, format, args...)
-	t.fail()
+func (f BoolFlag) Apply(set *flag.FlagSet) {
+	for _, name := range f.splitName() {
+		set.Bool(strings.TrimLeft(name, "-"), false, f.Usage)
+	}
+}
+
+func (f BoolFlag) DefType(importAsPkg string) string {
+	return fmt.Sprintf(`%s.BoolFlag{Name: "%s", Usage: "%s"}`, importAsPkg, f.Name, f.Usage)
+}
+
+func (f BoolFlag) splitName() (names []string) {
+	for _, name := range strings.Split(f.Name, ",") {
+		names = append(names, strings.TrimSpace(name))
+	}
+
+	return
 }

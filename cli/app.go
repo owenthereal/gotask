@@ -73,13 +73,9 @@ func parseCommands() (cmds []cli.Command, err error) {
 			Name:        task.Name,
 			Usage:       task.Usage,
 			Description: task.Description,
-			Flags: []cli.Flag{
-				debugFlag,
-			},
+			Flags:       append(t.ToCLIFlags(), debugFlag),
 			Action: func(c *cli.Context) {
-				args := []string{task.Name}
-				args = append(args, c.Args()...)
-				err := runTasks(args, c.Bool("debug"))
+				err := runTasks(os.Args[1:], c.Bool("debug"))
 				if err != nil {
 					log.Fatal(err)
 				}
