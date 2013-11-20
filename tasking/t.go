@@ -11,6 +11,7 @@ import (
 type T struct {
 	mu     sync.RWMutex
 	Args   []string
+	Flags  Flags
 	output []string
 	failed bool
 }

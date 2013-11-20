@@ -34,7 +34,7 @@ func convertToCommands(tasks []Task) (cmds []cli.Command) {
 			Description: task.Description,
 			Flags:       task.ToCLIFlags(),
 			Action: func(c *cli.Context) {
-				runTask(task, c.Args())
+				runTask(task, c)
 			},
 		}
 
@@ -44,8 +44,8 @@ func convertToCommands(tasks []Task) (cmds []cli.Command) {
 	return
 }
 
-func runTask(task Task, args []string) {
-	t := &T{Args: args}
+func runTask(task Task, c *cli.Context) {
+	t := &T{Args: c.Args(), Flags: Flags{c}}
 	task.Action(t)
 	if t.Failed() {
 		os.Exit(1)

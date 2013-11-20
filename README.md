@@ -35,6 +35,9 @@ import "github.com/jingweno/gotask/tasking"
 //
 // DESCRIPTION
 //    A textual description of the task function
+//
+// OPTIONS
+//    Definition of what command line options it takes
 func TaskXxx(t *tasking.T) {
   ...
 }
@@ -52,6 +55,7 @@ Without declaring the [task name in the comments](https://github.com/jingweno/go
 The comments for the task function are parsed as the task's man page by following the [man page layout](http://en.wikipedia.org/wiki/Man_page#Layout):
 Section NAME contains the name of the task and a one-line description of what it does, separated by a "-".
 Section DESCRIPTION contains the textual description of the task function.
+Section OPTIONS contains the definition of the command line flags it takes.
 
 ### Build Tags
 
@@ -85,9 +89,9 @@ On a [Go project](http://golang.org/doc/code.html#Organization), create a file c
 package main
 
 import (
-	"fmt"
 	"github.com/jingweno/gotask/tasking"
 	"os/user"
+	"time"
 )
 
 // NAME
@@ -95,9 +99,17 @@ import (
 //
 // DESCRIPTION
 //    Print out hello to current user
+//
+// OPTIONS
+//    --verbose, -v
+//        run in verbose mode
 func TaskSayHello(t *tasking.T) {
 	user, _ := user.Current()
-	fmt.Printf("Hello %s\n", user.Name)
+	if t.Flags.Bool("v") || t.Flags.Bool("verbose") {
+		t.Logf("Hello %s, the time now is %s\n", user.Name, time.Now())
+	} else {
+		t.Logf("Hello %s\n", user.Name)
+	}
 }
 ```
 
@@ -129,7 +141,7 @@ GLOBAL OPTIONS:
 ```
 
 Noticing section NAME of the comments appears as the task name and usage for
-`say-hello`, section DESCRIPTION becomes the description:
+`say-hello`, section DESCRIPTION becomes the description, section OPTIONS becomes the options:
 
 ```plain
 $ gotask say-hello -h
@@ -143,7 +155,8 @@ DESCRIPTION:
    Print out hello to current user
 
 OPTIONS:
-   --debug      run in debug mode
+   --verbose, -v        run in verbose mode
+   --debug              run in debug mode
 ```
 
 To execute the task, type:
@@ -151,6 +164,13 @@ To execute the task, type:
 ```plain
 $ gotask say-hello
 Hello Owen Ou
+```
+
+To execute the task in verbose mode, type:
+
+```plain
+$ gotask say-hello -v
+Hello Owen Ou, the time now is 2013-11-20 15:32:00.73771438 -0800 PST
 ```
 
 To compile the task into an executable named `pkg.task` where pkg is the

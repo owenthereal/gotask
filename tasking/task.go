@@ -36,6 +36,14 @@ func (t *Task) ToCLIFlags() (flags []cli.Flag) {
 	return
 }
 
+type Flags struct {
+	context *cli.Context
+}
+
+func (f Flags) Bool(name string) bool {
+	return f.context.Bool(name)
+}
+
 type Flag interface {
 	fmt.Stringer
 	Apply(*flag.FlagSet)
