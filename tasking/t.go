@@ -2,11 +2,20 @@ package tasking
 
 import (
 	"fmt"
+	"github.com/codegangsta/cli"
 	"github.com/kballard/go-shellquote"
 	"os"
 	"strings"
 	"sync"
 )
+
+type Flags struct {
+	C *cli.Context
+}
+
+func (f Flags) Bool(name string) bool {
+	return f.C.Bool(name)
+}
 
 type T struct {
 	mu     sync.RWMutex

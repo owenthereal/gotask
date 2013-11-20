@@ -1,7 +1,8 @@
-package tasking
+package task
 
 import (
 	"github.com/codegangsta/cli"
+	"github.com/jingweno/gotask/tasking"
 	"os"
 )
 
@@ -45,7 +46,7 @@ func convertToCommands(tasks []Task) (cmds []cli.Command) {
 }
 
 func runTask(task Task, c *cli.Context) {
-	t := &T{Args: c.Args(), Flags: Flags{c}}
+	t := &tasking.T{Args: c.Args(), Flags: tasking.Flags{c}}
 	task.Action(t)
 	if t.Failed() {
 		os.Exit(1)

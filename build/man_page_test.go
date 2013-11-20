@@ -2,7 +2,7 @@ package build
 
 import (
 	"github.com/bmizerany/assert"
-	"github.com/jingweno/gotask/tasking"
+	"github.com/jingweno/gotask/task"
 	"testing"
 )
 
@@ -27,8 +27,8 @@ OPTIONS
 	assert.Equal(t, "Print out hello to current user\n   one more line", mp.Description)
 	assert.Equal(t, 1, len(mp.Flags))
 
-	firstFlag, ok := mp.Flags[0].(tasking.BoolFlag)
-	assert.Tf(t, ok, "Can't convert flag to tasking.BoolFlag")
+	firstFlag, ok := mp.Flags[0].(task.BoolFlag)
+	assert.Tf(t, ok, "Can't convert flag to task.BoolFlag")
 	assert.Equal(t, "-v, --verbose", firstFlag.Name)
 	assert.Equal(t, "Run in verbose mode", firstFlag.Usage)
 

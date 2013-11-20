@@ -1,9 +1,10 @@
-package tasking
+package task
 
 import (
 	"flag"
 	"fmt"
 	"github.com/codegangsta/cli"
+	"github.com/jingweno/gotask/tasking"
 	"strings"
 )
 
@@ -25,7 +26,7 @@ type Task struct {
 	Description string
 	Flags       []Flag
 	ActionName  string
-	Action      func(*T)
+	Action      func(*tasking.T)
 }
 
 func (t *Task) ToCLIFlags() (flags []cli.Flag) {
@@ -34,14 +35,6 @@ func (t *Task) ToCLIFlags() (flags []cli.Flag) {
 	}
 
 	return
-}
-
-type Flags struct {
-	context *cli.Context
-}
-
-func (f Flags) Bool(name string) bool {
-	return f.context.Bool(name)
 }
 
 type Flag interface {

@@ -2,7 +2,7 @@ package build
 
 import (
 	"fmt"
-	"github.com/jingweno/gotask/tasking"
+	"github.com/jingweno/gotask/task"
 	"go/ast"
 	"go/build"
 	goparser "go/parser"
@@ -21,7 +21,7 @@ func NewParser() *parser {
 
 type parser struct{}
 
-func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
+func (l *parser) Parse(dir string) (taskSet *task.TaskSet, err error) {
 	dir, err = expandPath(dir)
 	if err != nil {
 		return
@@ -55,7 +55,7 @@ func (l *parser) Parse(dir string) (taskSet *tasking.TaskSet, err error) {
 
 	importPath = strings.Replace(p.ImportPath, "\\", "/", -1)
 
-	taskSet = &tasking.TaskSet{
+	taskSet = &task.TaskSet{
 		Name:       name,
 		Dir:        p.Dir,
 		PkgObj:     p.PkgObj,
@@ -118,7 +118,7 @@ func findImportPath(gp, dir string) (importPath string, err error) {
 	return
 }
 
-func loadTasks(dir string, files []string) (tasks []tasking.Task, err error) {
+func loadTasks(dir string, files []string) (tasks []task.Task, err error) {
 	taskFiles := filterTaskFiles(files)
 	for _, taskFile := range taskFiles {
 		ts, e := parseTasks(filepath.Join(dir, taskFile))
@@ -143,7 +143,7 @@ func filterTaskFiles(files []string) (taskFiles []string) {
 	return
 }
 
-func parseTasks(filename string) (tasks []tasking.Task, err error) {
+func parseTasks(filename string) (tasks []task.Task, err error) {
 	taskFileSet := token.NewFileSet()
 	f, err := goparser.ParseFile(taskFileSet, filename, nil, goparser.ParseComments)
 	if err != nil {
@@ -172,7 +172,7 @@ func parseTasks(filename string) (tasks []tasking.Task, err error) {
 				mp.Name = convertActionNameToTaskName(actionName)
 			}
 
-			t := tasking.Task{Name: mp.Name, ActionName: actionName, Usage: mp.Usage, Description: mp.Description, Flags: mp.Flags}
+			t := task.Task{Name: mp.Name, ActionName: actionName, Usage: mp.Usage, Description: mp.Description, Flags: mp.Flags}
 			tasks = append(tasks, t)
 		}
 	}

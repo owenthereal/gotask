@@ -3,7 +3,7 @@ package build
 import (
 	"bufio"
 	"bytes"
-	"github.com/jingweno/gotask/tasking"
+	"github.com/jingweno/gotask/task"
 	"io"
 	"regexp"
 	"strings"
@@ -13,7 +13,7 @@ type manPage struct {
 	Name        string
 	Usage       string
 	Description string
-	Flags       []tasking.Flag
+	Flags       []task.Flag
 }
 
 type manPageParser struct {
@@ -95,7 +95,7 @@ func (p *manPageParser) splitNameAndUsage(nameAndUsage string) (name, usage stri
 	return
 }
 
-func (p *manPageParser) parseOptions(optsStr string) (flags []tasking.Flag, err error) {
+func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err error) {
 	reader := bufio.NewReader(bytes.NewReader([]byte(optsStr)))
 	flagRegexp := regexp.MustCompile(`(\-?\-\w+,?)+`)
 
@@ -108,7 +108,7 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []tasking.Flag, err 
 		if flagRegexp.MatchString(line) {
 			if name != line {
 				if name != "" {
-					flags = append(flags, tasking.BoolFlag{Name: name, Usage: concatFlagContent(content)})
+					flags = append(flags, task.BoolFlag{Name: name, Usage: concatFlagContent(content)})
 				}
 
 				name = line
@@ -123,7 +123,7 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []tasking.Flag, err 
 	}
 	// the last one
 	if name != "" {
-		flags = append(flags, tasking.BoolFlag{Name: name, Usage: concatFlagContent(content)})
+		flags = append(flags, task.BoolFlag{Name: name, Usage: concatFlagContent(content)})
 	}
 
 	if err == io.EOF {

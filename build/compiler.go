@@ -2,7 +2,7 @@ package build
 
 import (
 	"fmt"
-	"github.com/jingweno/gotask/tasking"
+	"github.com/jingweno/gotask/task"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -13,7 +13,7 @@ import (
 type compiler struct {
 	sourceDir string
 	workDir   string
-	TaskSet   *tasking.TaskSet
+	TaskSet   *task.TaskSet
 	isDebug   bool
 }
 
@@ -56,7 +56,7 @@ func (c *compiler) removeInstalledPkgs() (err error) {
 	return
 }
 
-func (c *compiler) writeTaskMain(work string, taskSet *tasking.TaskSet) (file string, err error) {
+func (c *compiler) writeTaskMain(work string, taskSet *task.TaskSet) (file string, err error) {
 	// create task dir
 	taskDir := filepath.Join(work, filepath.FromSlash(taskSet.ImportPath))
 	err = os.MkdirAll(taskDir, 0777)
