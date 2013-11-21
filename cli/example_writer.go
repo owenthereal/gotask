@@ -30,6 +30,10 @@ import (
 //
 // DESCRIPTION
 //    Say hello world
+//
+// OPTIONS
+//    --verbose, -v
+//        run in verbose mode
 func TaskHello(t *tasking.T) {
 	t.Log("Hello world")
 }`))
