@@ -1,11 +1,9 @@
 package task
 
 import (
-	"flag"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/jingweno/gotask/tasking"
-	"strings"
 )
 
 type TaskSet struct {
@@ -38,34 +36,22 @@ func (t *Task) ToCLIFlags() (flags []cli.Flag) {
 }
 
 type Flag interface {
-	fmt.Stringer
-	Apply(*flag.FlagSet)
+	cli.Flag
 	DefType(importAsPkg string) string
 }
 
 type BoolFlag struct {
-	Name  string
-	Usage string
+	cli.BoolFlag
 }
 
-func (f BoolFlag) String() string {
-	return fmt.Sprintf("%s\t%v", strings.Join(f.splitName(), ", "), f.Usage)
-}
-
-func (f BoolFlag) Apply(set *flag.FlagSet) {
-	for _, name := range f.splitName() {
-		set.Bool(strings.TrimLeft(name, "-"), false, f.Usage)
-	}
+func (f BoolFlag) getName() string {
+	return f.Name
 }
 
 func (f BoolFlag) DefType(importAsPkg string) string {
-	return fmt.Sprintf(`%s.BoolFlag{Name: "%s", Usage: "%s"}`, importAsPkg, f.Name, f.Usage)
+	return fmt.Sprintf(`%s.NewBoolFlag("%s", "%s")`, importAsPkg, f.Name, f.Usage)
 }
 
-func (f BoolFlag) splitName() (names []string) {
-	for _, name := range strings.Split(f.Name, ",") {
-		names = append(names, strings.TrimSpace(name))
-	}
-
-	return
+func NewBoolFlag(name, usage string) BoolFlag {
+	return BoolFlag{cli.BoolFlag{Name: name, Usage: usage}}
 }

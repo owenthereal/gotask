@@ -1,24 +1,13 @@
 package cli
 
 import (
-	"flag"
 	"fmt"
+	"github.com/codegangsta/cli"
 	"os"
 	"path/filepath"
 )
 
-type generateFlag struct {
-	Usage string
-}
-
-func (f generateFlag) String() string {
-	return fmt.Sprintf("--generate, -g\t%v", f.Usage)
-}
-
-func (f generateFlag) Apply(set *flag.FlagSet) {
-	set.Bool("g", false, f.Usage)
-	set.Bool("generate", false, f.Usage)
-}
+var generateFlag = cli.BoolFlag{Name: "generate, g", Usage: "generate a task scaffold named pkg_task.go"}
 
 func generateNewTask() (fileName string, err error) {
 	sourceDir, err := os.Getwd()
