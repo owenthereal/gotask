@@ -50,11 +50,12 @@ where `Xxx` can be any alphanumeric string (but the first letter must not be in 
 Without declaring the [task name in the comments](https://github.com/jingweno/gotask#comments-as-man-page),
 `gotask` will dasherize the `Xxx` part of the task function name and use it as the task name.
 
-### Comments as Man Page
+### Comments as Man Page™
 
-The comments for the task function are parsed as the task's man page by following the [man page layout](http://en.wikipedia.org/wiki/Man_page#Layout):
-Section NAME contains the name of the task and a one-line description of what it does, separated by a "-".
-Section DESCRIPTION contains the textual description of the task function.
+It's a good practice to document tasks in a sensible way.
+In `gotask`, the comments for the task function are parsed as the task's man page by following the [man page layout](http://en.wikipedia.org/wiki/Man_page#Layout):
+Section NAME contains the name of the task and a one-line description of what it does, separated by a "-";
+Section DESCRIPTION contains the textual description of the task function;
 Section OPTIONS contains the definition of the command line flags it takes.
 
 ### Build Tags
