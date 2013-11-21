@@ -1,25 +1,14 @@
 package cli
 
 import (
-	"flag"
 	"fmt"
+	"github.com/codegangsta/cli"
 	"github.com/jingweno/gotask/build"
 	"os"
 	"path/filepath"
 )
 
-type compileFlag struct {
-	Usage string
-}
-
-func (f compileFlag) String() string {
-	return fmt.Sprintf("--compile, -c\t%v", f.Usage)
-}
-
-func (f compileFlag) Apply(set *flag.FlagSet) {
-	set.Bool("c", false, f.Usage)
-	set.Bool("compile", false, f.Usage)
-}
+var compileFlag = cli.BoolFlag{Name: "compile, c", Usage: "compile the task binary to pkg.task but do not run it"}
 
 func compileTasks(isDebug bool) (err error) {
 	sourceDir, err := os.Getwd()
