@@ -29,7 +29,7 @@ OPTIONS
 
 	firstFlag, ok := mp.Flags[0].(task.BoolFlag)
 	assert.Tf(t, ok, "Can't convert flag to task.BoolFlag")
-	assert.Equal(t, "-v, --verbose", firstFlag.Name)
+	assert.Equal(t, "v, verbose", firstFlag.Name)
 	assert.Equal(t, "Run in verbose mode", firstFlag.Usage)
 
 	doc = `Name

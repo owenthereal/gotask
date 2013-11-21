@@ -20,7 +20,7 @@ func TestMainWriter_Write(t *testing.T) {
 					Usage:       "Say Hello world",
 					Description: "Print out Hello World",
 					Flags: []task.Flag{
-						task.BoolFlag{Name: "-v --verbose", Usage: "Run in verbose mode"},
+						task.NewBoolFlag("v, verbose", "Run in verbose mode"),
 					},
 				},
 			},
@@ -32,5 +32,5 @@ func TestMainWriter_Write(t *testing.T) {
 	assert.Tf(t, strings.Contains(out.String(), `Name: "HelloWorld"`), "%v", out.String())
 	assert.Tf(t, strings.Contains(out.String(), `Usage: "Say Hello world"`), "%v", out.String())
 	assert.Tf(t, strings.Contains(out.String(), `Description: "Print out Hello World`), "%v", out.String())
-	assert.Tf(t, strings.Contains(out.String(), `task.BoolFlag{Name: "-v --verbose", Usage: "Run in verbose mode"}`), "%v", out.String())
+	assert.Tf(t, strings.Contains(out.String(), `task.NewBoolFlag("v, verbose", "Run in verbose mode")`), "%v", out.String())
 }

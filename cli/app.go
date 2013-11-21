@@ -22,8 +22,8 @@ func NewApp() *cli.App {
 	app.Version = Version
 	app.Commands = cmds
 	app.Flags = []cli.Flag{
-		generateFlag{Usage: "generate a task scaffold named pkg_task.go"},
-		compileFlag{Usage: "compile the task binary to pkg.task but do not run it"},
+		generateFlag,
+		compileFlag,
 		debugFlag,
 	}
 	app.Action = func(c *cli.Context) {

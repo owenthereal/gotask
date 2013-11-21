@@ -97,7 +97,7 @@ func (p *manPageParser) splitNameAndUsage(nameAndUsage string) (name, usage stri
 
 func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err error) {
 	reader := bufio.NewReader(bytes.NewReader([]byte(optsStr)))
-	flagRegexp := regexp.MustCompile(`(\-?\-\w+,?)+`)
+	flagRegexp := regexp.MustCompile(`\-?\-(\w+),?`)
 
 	var (
 		line, name string
@@ -108,10 +108,15 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err err
 		if flagRegexp.MatchString(line) {
 			if name != line {
 				if name != "" {
-					flags = append(flags, task.BoolFlag{Name: name, Usage: concatFlagContent(content)})
+					flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
 				}
 
-				name = line
+				var fstrs []string
+				for _, fstr := range flagRegexp.FindAllStringSubmatch(line, -1) {
+					fstrs = append(fstrs, fstr[1])
+				}
+
+				name = strings.Join(fstrs, ", ")
 				content = []string{}
 			}
 		} else {
@@ -123,7 +128,7 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err err
 	}
 	// the last one
 	if name != "" {
-		flags = append(flags, task.BoolFlag{Name: name, Usage: concatFlagContent(content)})
+		flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
 	}
 
 	if err == io.EOF {
