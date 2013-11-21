@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-var generateFlag = cli.BoolFlag{Name: "generate, g", Usage: "generate a task scaffold named pkg_task.go"}
+var generateFlag = cli.BoolFlag{Name: "generate, g", Usage: "generate a task scaffolding named pkg_task.go"}
 
 func generateNewTask() (fileName string, err error) {
 	sourceDir, err := os.Getwd()

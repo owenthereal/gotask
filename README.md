@@ -69,9 +69,9 @@ Without the build tag, task functions will be available to application build whi
 This is useful when you need to distribute your build executables.
 See `gotask -c` for details.
 
-## Task Scaffold
+## Task Scaffolding
 
-`gotask` is able to generate a task scaffold named `pkg_task.go` with the `--generate` or `-g` flag.
+`gotask` is able to generate a task scaffolding named `pkg_task.go` with the `--generate` or `-g` flag.
 `pkg` is the name of the package where `gotask` is run:
 
 ```plain
