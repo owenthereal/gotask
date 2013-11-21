@@ -14,11 +14,13 @@ type Flags struct {
 	C *cli.Context
 }
 
-// Looks up the value of a local bool flag, returns false if no bool flag exists
+// Bool looks up the value of a bool flag, returns false if no bool flag exists
 func (f Flags) Bool(name string) bool {
 	return f.C.Bool(name)
 }
 
+// T is a type that is passed through to each task function.
+// T can be used to retrieve context-specific Args and parsed command-line Flags.
 type T struct {
 	mu     sync.RWMutex
 	Args   []string // command-line arguments
@@ -27,7 +29,7 @@ type T struct {
 	failed bool
 }
 
-// Run the system command. If multiple arguments are given, they're concatenated to one command.
+// Exec runs the system command. If multiple arguments are given, they're concatenated to one command.
 //
 // Example:
 //   t.Exec("ls -ltr")
@@ -51,7 +53,7 @@ func (t *T) Fail() {
 	t.failed = true
 }
 
-// Check if the task has failed
+// Failed checks if the task has failed
 func (t *T) Failed() bool {
 	t.mu.Lock()
 	defer t.mu.Unlock()
