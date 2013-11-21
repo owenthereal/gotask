@@ -9,18 +9,20 @@ import (
 	"sync"
 )
 
+// Flags can be used to retrieve parsed command-line options.
 type Flags struct {
 	C *cli.Context
 }
 
+// Looks up the value of a local bool flag, returns false if no bool flag exists
 func (f Flags) Bool(name string) bool {
 	return f.C.Bool(name)
 }
 
 type T struct {
 	mu     sync.RWMutex
-	Args   []string
-	Flags  Flags
+	Args   []string // command-line arguments
+	Flags  Flags    // command-line options
 	output []string
 	failed bool
 }
