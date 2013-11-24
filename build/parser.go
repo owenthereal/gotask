@@ -7,9 +7,7 @@ import (
 	"go/build"
 	goparser "go/parser"
 	"go/token"
-	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -27,7 +25,7 @@ func (l *parser) Parse(dir string) (taskSet *task.TaskSet, err error) {
 		return
 	}
 
-	importPath, err := findImportPath(os.Getenv("GOPATH"), dir)
+	importPath, err := findImportPath(dir)
 	if err != nil {
 		return
 	}
@@ -36,7 +34,7 @@ func (l *parser) Parse(dir string) (taskSet *task.TaskSet, err error) {
 	taskFiles := append(p.GoFiles, p.IgnoredGoFiles...)
 	taskFiles = append(taskFiles, p.CgoFiles...)
 	if e != nil {
-		// task files may be ignored for build
+		// tasks are ignored for build
 		if _, ok := e.(*build.NoGoError); !ok || len(taskFiles) == 0 {
 			err = e
 			return
@@ -80,41 +78,20 @@ func expandPath(path string) (expanded string, err error) {
 	return
 }
 
-func findImportPath(gp, dir string) (importPath string, err error) {
-	var gopaths []string
-	// GOPATHs are separated by ; on Windows
-	if runtime.GOOS == "windows" {
-		gopaths = strings.Split(gp, ";")
-	} else {
-		gopaths = strings.Split(gp, ":")
+func findImportPath(dir string) (importPath string, err error) {
+	p, e := build.ImportDir(dir, 0)
+	if e != nil {
+		// tasks are ignored for build
+		if _, ok := e.(*build.NoGoError); !ok || p.ImportPath == "" {
+			err = e
+			return
+		}
 	}
-
-	if len(gopaths) == 0 {
-		err = fmt.Errorf("Environment variable GOPATH is not found")
+	if err != nil {
 		return
 	}
 
-	for _, gopath := range gopaths {
-		gopath, e := expandPath(gopath)
-		if e != nil {
-			continue
-		}
-
-		srcPath := filepath.Join(gopath, "src")
-		if !strings.HasPrefix(dir, srcPath) {
-			continue
-		}
-
-		importPath, e = filepath.Rel(srcPath, dir)
-		if e == nil && importPath != "" {
-			break
-		}
-	}
-
-	if importPath == "" {
-		err = fmt.Errorf("Can't find import path in %s", dir)
-	}
-
+	importPath = p.ImportPath
 	return
 }
 
