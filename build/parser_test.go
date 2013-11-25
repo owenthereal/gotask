@@ -12,7 +12,7 @@ func TestParser_findImportPath(t *testing.T) {
 	importPath, err := findImportPath(dir)
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, filepath.Join("github.com", "jingweno", "gotask", "examples"), importPath)
+	assert.Equal(t, "github.com/jingweno/gotask/examples", importPath)
 }
 
 func TestParser_Load(t *testing.T) {
