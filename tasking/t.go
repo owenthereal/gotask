@@ -60,6 +60,18 @@ func (t *T) Failed() bool {
 	return t.failed
 }
 
+// Fatal is equivalent to Error followed by a call to os.Exit(1).
+func (t *T) Fatal(args ...interface{}) {
+	t.Error(args)
+	os.Exit(1)
+}
+
+// Fatalf is equivalent to Errorf followed by a call to os.Exit(1).
+func (t *T) Fatalf(format string, args ...interface{}) {
+	t.Errorf(format, args)
+	os.Exit(1)
+}
+
 // Log formats its arguments using default formatting, analogous to Println.
 func (t *T) Log(args ...interface{}) {
 	fmt.Println(args...)
