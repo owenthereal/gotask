@@ -1,10 +1,11 @@
 # gotask [![Build Status](https://travis-ci.org/jingweno/gotask.png?branch=master)](https://travis-ci.org/jingweno/gotask) [![GoDoc](https://godoc.org/github.com/jingweno/gotask/tasking?status.png)](http://godoc.org/github.com/jingweno/gotask/tasking)
 
-A convention-over-configuration build tool in Go.
+An idiomatic build tool in Go.
 
 ## Motivation
 
 To write build tasks on a Go project in Go instead of Make, Rake or insert your build tool here.
+I've written a longer [preach](http://owenou.com/2013/11/27/writing-build-tasks-in-go-with-gotask.html) on the motivation.
 
 ## Overview
 
@@ -47,8 +48,8 @@ where `Xxx` can be any alphanumeric string (but the first letter must not be in 
 
 ### Task Name
 
-Without declaring the [task name in the comments](https://github.com/jingweno/gotask#comments-as-man-page),
-`gotask` will dasherize the `Xxx` part of the task function name and use it as the task name.
+By default, `gotask` will dasherize the `Xxx` part of the task function name and use it as the task name,
+without you further declaring it [in the comments](https://github.com/jingweno/gotask#comments-as-man-page).
 
 ### Comments as Man Page™
 
@@ -71,8 +72,8 @@ See `gotask -c` for details.
 
 ## Task Scaffolding
 
-`gotask` is able to generate a task scaffolding named `pkg_task.go` with the `--generate` or `-g` flag.
-`pkg` is the name of the package where `gotask` is run:
+`gotask` is able to generate a task scaffolding to quickly get you started for writing build task with the `--generate` or `-g` flag.
+The generated task is named as `pkg_task.go` where `pkg` is the name of the package that `gotask` is run:
 
 ```plain
 // in a folder where package example is defined
@@ -116,7 +117,7 @@ func TaskSayHello(t *tasking.T) {
 
 Make sure the build tag `// +build gotask` is the first line of the file and there's an empty line before package definition.
 The comments of the task should be in the format of the [man page layout](http://en.wikipedia.org/wiki/Man_page#Layout).
-Running `gotask -h` displays all the tasks:
+Running `gotask -h` will display all the tasks:
 
 ```plain
 $ gotask -h
@@ -141,6 +142,7 @@ GLOBAL OPTIONS:
    --help, -h           show help
 ```
 
+Running `gotask say-hello -h` will display usage for a task.
 Noticing section NAME of the comments appears as the task name and usage for
 `say-hello`, section DESCRIPTION becomes the description, section OPTIONS becomes the options:
 
