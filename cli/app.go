@@ -47,7 +47,10 @@ func NewApp() *cli.App {
 			return
 		}
 
-		if len(c.Args()) == 0 {
+		args := c.Args()
+		if len(args) > 0 {
+			cli.ShowCommandHelp(c, args[0])
+		} else {
 			cli.ShowAppHelp(c)
 		}
 	}
