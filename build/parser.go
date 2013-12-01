@@ -31,15 +31,17 @@ func (l *parser) Parse(dir string) (taskSet *task.TaskSet, err error) {
 	}
 
 	p, e := build.Import(importPath, dir, 0)
-	taskFiles := append(p.GoFiles, p.IgnoredGoFiles...)
-	taskFiles = append(taskFiles, p.CgoFiles...)
 	if e != nil {
-		// tasks are ignored for build
-		if _, ok := e.(*build.NoGoError); !ok || len(taskFiles) == 0 {
+		// allow no task files found
+		if _, ok := e.(*build.NoGoError); !ok {
 			err = e
 			return
 		}
 	}
+
+	// gather task files including those are ignored
+	taskFiles := append(p.GoFiles, p.IgnoredGoFiles...)
+	taskFiles = append(taskFiles, p.CgoFiles...)
 
 	tasks, err := loadTasks(dir, taskFiles)
 	if err != nil {
@@ -51,6 +53,7 @@ func (l *parser) Parse(dir string) (taskSet *task.TaskSet, err error) {
 		name = filepath.Base(p.Dir)
 	}
 
+	// fix import path on Windows
 	importPath = strings.Replace(p.ImportPath, "\\", "/", -1)
 
 	taskSet = &task.TaskSet{
@@ -81,7 +84,7 @@ func expandPath(path string) (expanded string, err error) {
 func findImportPath(dir string) (importPath string, err error) {
 	p, e := build.ImportDir(dir, 0)
 	if e != nil {
-		// tasks are ignored for build
+		// tasks maybe ignored for build
 		if _, ok := e.(*build.NoGoError); !ok || p.ImportPath == "" {
 			err = e
 			return
