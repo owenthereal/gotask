@@ -72,7 +72,7 @@ See `gotask -c` for details.
 
 ## Task Scaffolding
 
-`gotask` is able to generate a task scaffolding to quickly get you started for writing build task with the `--generate` or `-g` flag.
+`gotask` is able to generate a task scaffolding to quickly get you started for writing build tasks with the `--generate` or `-g` flag.
 The generated task is named as `pkg_task.go` where `pkg` is the name of the package that `gotask` is run:
 
 ```plain
@@ -81,9 +81,15 @@ $ gotask -g
 create example_task.go
 ```
 
+## Multiple Tasks
+
+You can define multiple task functions by following the `TaskXxx` convention in a task file.
+You can also create multiple task files by following the `xxx_task.go` convention.
+`gotask` is able to find all tasks in the same directory where it's run.
+
 ## Examples
 
-On a [Go project](http://golang.org/doc/code.html#Organization), create a file called `say_hello_task.go` with the following content:
+On a [Go project](http://golang.org/doc/code.html#Organization), create a file called `sayhello_task.go` with the following content:
 
 ```go
 // +build gotask
@@ -181,6 +187,13 @@ last segment of the import path using `go build`, type:
 
 ```plain
 $ gotask -c
+```
+
+Running the compiled tasks yields the same result:
+
+```plain
+$ ./examples.task say-hello
+Hello Owen Ou
 ```
 
 More [examples](https://github.com/jingweno/gotask/tree/master/examples) are available.
