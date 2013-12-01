@@ -2,6 +2,7 @@ package build
 
 import (
 	"github.com/bmizerany/assert"
+	"io/ioutil"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -15,7 +16,7 @@ func TestParser_findImportPath(t *testing.T) {
 	assert.Equal(t, "github.com/jingweno/gotask/examples", importPath)
 }
 
-func TestParser_Load(t *testing.T) {
+func TestParser_Parse(t *testing.T) {
 	p := NewParser()
 	ts, err := p.Parse("../examples")
 
@@ -25,6 +26,18 @@ func TestParser_Load(t *testing.T) {
 	assert.Tf(t, strings.HasSuffix(ts.PkgObj, filepath.Join("github.com", "jingweno", "gotask", "examples.a")), "%s", ts.PkgObj)
 	assert.Equal(t, "github.com/jingweno/gotask/examples", ts.ImportPath)
 	assert.Equal(t, 2, len(ts.Tasks))
+
+	// no task files found
+	temp, err := ioutil.TempDir("", "go-task")
+	assert.Equal(t, nil, err)
+
+	ts, err = p.Parse(temp)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, filepath.Base(temp), ts.Name)
+	assert.Equal(t, ".", ts.ImportPath)
+	assert.Equal(t, "", ts.PkgObj)
+	assert.Equal(t, temp, ts.Dir)
+	assert.Equal(t, 0, len(ts.Tasks))
 }
 
 func TestTaskParser_filterTaskFiles(t *testing.T) {
