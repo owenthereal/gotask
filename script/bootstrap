@@ -1,5 +1,4 @@
 #!/bin/bash
 
-go get -d -v ./...
+go get -d -t -v ./...
 go get code.google.com/p/go.tools/cmd/cover
-go get github.com/bmizerany/assert
