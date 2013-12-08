@@ -97,6 +97,13 @@ func runTasks(args []string, isDebug bool) (err error) {
 		return
 	}
 
-	err = build.Run(sourceDir, args, isDebug)
+	filteredArgs := make([]string, 0)
+	for _, arg := range args {
+		if arg != "--debug" {
+			filteredArgs = append(filteredArgs, arg)
+		}
+	}
+
+	err = build.Run(sourceDir, filteredArgs, isDebug)
 	return
 }
