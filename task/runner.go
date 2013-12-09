@@ -46,7 +46,7 @@ func convertToCommands(tasks []Task) (cmds []cli.Command) {
 }
 
 func runTask(task Task, c *cli.Context) {
-	t := &tasking.T{Args: c.Args(), Flags: tasking.Flags{c}}
+	t := &tasking.T{Args: c.Args(), Flags: tasking.Flags{C: c}}
 	task.Action(t)
 	if t.Failed() {
 		os.Exit(1)

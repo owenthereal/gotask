@@ -8,7 +8,9 @@ import (
 	"os"
 )
 
-var debugFlag = cli.BoolFlag{"debug", "run in debug mode"}
+var (
+	debugFlag = cli.BoolFlag{Name: "debug", Usage: "run in debug mode"}
+)
 
 func NewApp() *cli.App {
 	cmds, err := parseCommands()
