@@ -136,7 +136,7 @@ USAGE:
 VERSION:
    0.8.0
 
-OMMANDS:
+COMMANDS:
    say-hello    Say hello to current user
    help, h      Shows a list of commands or help for one command
 
