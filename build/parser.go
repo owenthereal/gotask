@@ -30,7 +30,9 @@ func (l *parser) Parse(dir string) (taskSet *task.TaskSet, err error) {
 		return
 	}
 
-	p, e := build.Import(importPath, dir, 0)
+	ctx := build.Default
+	ctx.BuildTags = append(ctx.BuildTags, "gotask")
+	p, e := ctx.Import(importPath, dir, 0)
 	if e != nil {
 		// allow no task files found
 		if _, ok := e.(*build.NoGoError); !ok {
@@ -40,10 +42,7 @@ func (l *parser) Parse(dir string) (taskSet *task.TaskSet, err error) {
 	}
 
 	// gather task files including those are ignored
-	taskFiles := append(p.GoFiles, p.IgnoredGoFiles...)
-	taskFiles = append(taskFiles, p.CgoFiles...)
-
-	tasks, err := loadTasks(dir, taskFiles)
+	tasks, err := loadTasks(dir, p.GoFiles)
 	if err != nil {
 		return
 	}
