@@ -19,6 +19,11 @@ func (f Flags) Bool(name string) bool {
 	return f.C.Bool(name)
 }
 
+// String looks up the value of a string flag, returns an empty if no string flag exists
+func (f Flags) String(name string) string {
+	return f.C.String(name)
+}
+
 // T is a type that is passed through to each task function.
 // T can be used to retrieve context-specific Args and parsed command-line Flags.
 type T struct {

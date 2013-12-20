@@ -3,6 +3,7 @@ package build
 import (
 	"bufio"
 	"bytes"
+	//	"fmt"
 	"github.com/jingweno/gotask/task"
 	"io"
 	"regexp"
@@ -97,9 +98,10 @@ func (p *manPageParser) splitNameAndUsage(nameAndUsage string) (name, usage stri
 
 func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err error) {
 	reader := bufio.NewReader(bytes.NewReader([]byte(optsStr)))
-	flagRegexp := regexp.MustCompile(`\-?\-(\w+),?`)
+	flagRegexp := regexp.MustCompile(`\-?\-(\w+),?(=(\w+))?`)
 
 	var (
+		stringFlag bool
 		line, name string
 		content    []string
 	)
@@ -108,14 +110,20 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err err
 		if flagRegexp.MatchString(line) {
 			if name != line {
 				if name != "" {
-					flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
+					if stringFlag {
+						flags = append(flags, task.NewStringFlag(name, "", concatFlagContent(content)))
+					} else {
+						flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
+					}
 				}
-
 				var fstrs []string
+				stringFlag = false
 				for _, fstr := range flagRegexp.FindAllStringSubmatch(line, -1) {
 					fstrs = append(fstrs, fstr[1])
+					if fstr[2] != "" && fstr[3] != "" {
+						stringFlag = true
+					}
 				}
-
 				name = strings.Join(fstrs, ", ")
 				content = []string{}
 			}
@@ -128,7 +136,11 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err err
 	}
 	// the last one
 	if name != "" {
-		flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
+		if stringFlag {
+			flags = append(flags, task.NewStringFlag(name, "", concatFlagContent(content)))
+		} else {
+			flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
+		}
 	}
 
 	if err == io.EOF {
