@@ -100,27 +100,27 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err err
 	flagRegexp := regexp.MustCompile(`\-?\-(\w+),?(=(\w+))?`)
 
 	var (
-		stringFlag bool
-		line, name string
-		content    []string
+		stringValue string
+		line, name  string
+		content     []string
 	)
 	for err == nil {
 		line, err = readLine(reader)
 		if flagRegexp.MatchString(line) {
 			if name != line {
 				if name != "" {
-					if stringFlag {
-						flags = append(flags, task.NewStringFlag(name, "", concatFlagContent(content)))
+					if stringValue != "" {
+						flags = append(flags, task.NewStringFlag(name, stringValue, concatFlagContent(content)))
 					} else {
 						flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
 					}
 				}
 				var fstrs []string
-				stringFlag = false
+				stringValue = ""
 				for _, fstr := range flagRegexp.FindAllStringSubmatch(line, -1) {
 					fstrs = append(fstrs, fstr[1])
 					if fstr[2] != "" && fstr[3] != "" {
-						stringFlag = true
+						stringValue = fstr[3]
 					}
 				}
 				name = strings.Join(fstrs, ", ")
@@ -135,8 +135,8 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err err
 	}
 	// the last one
 	if name != "" {
-		if stringFlag {
-			flags = append(flags, task.NewStringFlag(name, "", concatFlagContent(content)))
+		if stringValue != "" {
+			flags = append(flags, task.NewStringFlag(name, stringValue, concatFlagContent(content)))
 		} else {
 			flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
 		}
