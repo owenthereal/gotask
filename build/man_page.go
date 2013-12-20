@@ -3,7 +3,6 @@ package build
 import (
 	"bufio"
 	"bytes"
-	//	"fmt"
 	"github.com/jingweno/gotask/task"
 	"io"
 	"regexp"
