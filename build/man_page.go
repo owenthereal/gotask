@@ -97,30 +97,31 @@ func (p *manPageParser) splitNameAndUsage(nameAndUsage string) (name, usage stri
 
 func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err error) {
 	reader := bufio.NewReader(bytes.NewReader([]byte(optsStr)))
-	flagRegexp := regexp.MustCompile(`\-?\-(\w+),?(=(\w+))?`)
-
+	flagRegexp := regexp.MustCompile(`\-?\-(\w+),?(=\"(\w+)\")?`)
 	var (
-		stringValue string
-		line, name  string
-		content     []string
+		isStringFlag    bool
+		stringFlagValue string
+		line, name      string
+		content         []string
 	)
 	for err == nil {
 		line, err = readLine(reader)
 		if flagRegexp.MatchString(line) {
 			if name != line {
 				if name != "" {
-					if stringValue != "" {
-						flags = append(flags, task.NewStringFlag(name, stringValue, concatFlagContent(content)))
+					if isStringFlag {
+						flags = append(flags, task.NewStringFlag(name, stringFlagValue, concatFlagContent(content)))
 					} else {
 						flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
 					}
 				}
 				var fstrs []string
-				stringValue = ""
+				stringFlagValue = ""
+				isStringFlag = strings.Contains(line, `="`)
 				for _, fstr := range flagRegexp.FindAllStringSubmatch(line, -1) {
 					fstrs = append(fstrs, fstr[1])
-					if fstr[2] != "" && fstr[3] != "" {
-						stringValue = fstr[3]
+					if isStringFlag {
+						stringFlagValue = fstr[3]
 					}
 				}
 				name = strings.Join(fstrs, ", ")
@@ -135,8 +136,8 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err err
 	}
 	// the last one
 	if name != "" {
-		if stringValue != "" {
-			flags = append(flags, task.NewStringFlag(name, stringValue, concatFlagContent(content)))
+		if isStringFlag {
+			flags = append(flags, task.NewStringFlag(name, stringFlagValue, concatFlagContent(content)))
 		} else {
 			flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
 		}

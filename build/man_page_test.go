@@ -17,10 +17,10 @@ DESCRIPTION
 OPTIONS
     -v, --verbose
         Run in verbose mode
-    -n, --name=NAME
-        Say hello to the given NAME
-    -g, --greeting=TYPE
-        Say hello with a custom TYPE of greeting
+    -n, --name=""
+        Say hello to the given name
+    -g, --greeting="Hello"
+        Say hello with a custom type of greeting
 
 `
 	p := &manPageParser{doc}
@@ -40,12 +40,14 @@ OPTIONS
 	stringFlag, ok := mp.Flags[1].(task.StringFlag)
 	assert.Tf(t, ok, "Can't convert flag to task.StringFlag")
 	assert.Equal(t, "n, name", stringFlag.Name)
-	assert.Equal(t, "Say hello to the given NAME", stringFlag.Usage)
+	assert.Equal(t, "", stringFlag.Value)
+	assert.Equal(t, "Say hello to the given name", stringFlag.Usage)
 
 	stringFlag, ok = mp.Flags[2].(task.StringFlag)
 	assert.Tf(t, ok, "Can't convert flag to task.StringFlag")
 	assert.Equal(t, "g, greeting", stringFlag.Name)
-	assert.Equal(t, "Say hello with a custom TYPE of greeting", stringFlag.Usage)
+	assert.Equal(t, "Hello", stringFlag.Value)
+	assert.Equal(t, "Say hello with a custom type of greeting", stringFlag.Usage)
 
 	doc = `Name
     say-hello - Say hello to current user
