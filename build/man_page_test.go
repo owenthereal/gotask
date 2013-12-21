@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestManPageParse_Parse(t *testing.T) {
+func TestManPageParser_Parse(t *testing.T) {
 	doc := `NAME
     say-hello - Say hello to current user
 
@@ -15,10 +15,10 @@ DESCRIPTION
     one more line
 
 OPTIONS
-    -v, --verbose
-        Run in verbose mode
     -n, --name=""
         Say hello to the given name
+    -v, --verbose
+        Run in verbose mode
     -g, --greeting="Hello"
         Say hello with a custom type of greeting
 
@@ -32,16 +32,16 @@ OPTIONS
 	assert.Equal(t, "Print out hello to current user\n   one more line", mp.Description)
 	assert.Equal(t, 3, len(mp.Flags))
 
-	firstFlag, ok := mp.Flags[0].(task.BoolFlag)
-	assert.Tf(t, ok, "Can't convert flag to task.BoolFlag")
-	assert.Equal(t, "v, verbose", firstFlag.Name)
-	assert.Equal(t, "Run in verbose mode", firstFlag.Usage)
-
-	stringFlag, ok := mp.Flags[1].(task.StringFlag)
+	stringFlag, ok := mp.Flags[0].(task.StringFlag)
 	assert.Tf(t, ok, "Can't convert flag to task.StringFlag")
 	assert.Equal(t, "n, name", stringFlag.Name)
 	assert.Equal(t, "", stringFlag.Value)
 	assert.Equal(t, "Say hello to the given name", stringFlag.Usage)
+
+	boolFlag, ok := mp.Flags[1].(task.BoolFlag)
+	assert.Tf(t, ok, "Can't convert flag to task.BoolFlag")
+	assert.Equal(t, "v, verbose", boolFlag.Name)
+	assert.Equal(t, "Run in verbose mode", boolFlag.Usage)
 
 	stringFlag, ok = mp.Flags[2].(task.StringFlag)
 	assert.Tf(t, ok, "Can't convert flag to task.StringFlag")
