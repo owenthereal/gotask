@@ -45,7 +45,6 @@ func (t *T) Exec(cmd ...string) (err error) {
 	if err != nil {
 		return
 	}
-
 	err = execCmd(input)
 
 	return
@@ -67,13 +66,13 @@ func (t *T) Failed() bool {
 
 // Fatal is equivalent to Error followed by a call to os.Exit(1).
 func (t *T) Fatal(args ...interface{}) {
-	t.Error(args)
+	t.Error(args...)
 	os.Exit(1)
 }
 
 // Fatalf is equivalent to Errorf followed by a call to os.Exit(1).
 func (t *T) Fatalf(format string, args ...interface{}) {
-	t.Errorf(format, args)
+	t.Errorf(format, args...)
 	os.Exit(1)
 }
 
