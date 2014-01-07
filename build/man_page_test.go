@@ -15,13 +15,12 @@ DESCRIPTION
     one more line
 
 OPTIONS
-    -n, --name=""
+    -n, --name=[NAME]
         Say hello to the given name
     -v, --verbose
         Run in verbose mode
-    -g, --greeting="Hello"
+    -g, --greeting=Hello
         Say hello with a custom type of greeting
-
 `
 	p := &manPageParser{doc}
 	mp, err := p.Parse()

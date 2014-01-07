@@ -3,6 +3,7 @@ package build
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"github.com/jingweno/gotask/task"
 	"io"
 	"regexp"
@@ -97,7 +98,7 @@ func (p *manPageParser) splitNameAndUsage(nameAndUsage string) (name, usage stri
 
 func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err error) {
 	reader := bufio.NewReader(bytes.NewReader([]byte(optsStr)))
-	flagRegexp := regexp.MustCompile(`\-?\-(\w+),?(=\"(\w+)\")?`)
+	flagRegexp := regexp.MustCompile(`\-?\-(\w+),?(=(.+))?`)
 	var (
 		isStringFlag    bool
 		stringFlagValue string
@@ -116,15 +117,19 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err err
 					}
 				}
 				var fstrs []string
+				// FIXME: everything is string flag for now
+				// TODO: if it sees `,`, it can predict it's a StringSlice flag
+				isStringFlag = strings.Contains(line, `=`)
 				stringFlagValue = ""
-				isStringFlag = strings.Contains(line, `="`)
 				for _, fstr := range flagRegexp.FindAllStringSubmatch(line, -1) {
 					fstrs = append(fstrs, fstr[1])
 					if isStringFlag {
 						stringFlagValue = fstr[3]
+            fmt.Println(stringFlagValue)
 					}
 				}
 				name = strings.Join(fstrs, ", ")
+        fmt.Println(name)
 				content = []string{}
 			}
 		} else {
