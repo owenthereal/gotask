@@ -15,19 +15,18 @@ import (
 //    Print out hello to current user
 //
 // OPTIONS
-//    -n, --name=NAME
+//    -n, --name="NAME"
 //        say hello to an user with the given NAME
-//    -g, --greeting=TYPE
-//        say hello using the given TYPE of greeting
 //    -v, --verbose
 //        run in verbose mode
 func TaskSayHello(t *tasking.T) {
-	username := t.Flags.String("n")
+	username := t.Flags.String("name")
 	if username == "" {
 		user, _ := user.Current()
 		username = user.Name
 	}
-	if t.Flags.Bool("v") || t.Flags.Bool("verbose") {
+
+	if t.Flags.Bool("verbose") {
 		t.Logf("Hello %s, the time now is %s\n", username, time.Now())
 	} else {
 		t.Logf("Hello %s\n", username)
