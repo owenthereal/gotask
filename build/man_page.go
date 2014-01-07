@@ -3,11 +3,10 @@ package build
 import (
 	"bufio"
 	"bytes"
-	"fmt"
-	"github.com/jingweno/gotask/task"
 	"io"
 	"regexp"
 	"strings"
+	"github.com/jingweno/gotask/task"
 )
 
 type manPage struct {
@@ -125,11 +124,9 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err err
 					fstrs = append(fstrs, fstr[1])
 					if isStringFlag {
 						stringFlagValue = fstr[3]
-            fmt.Println(stringFlagValue)
 					}
 				}
 				name = strings.Join(fstrs, ", ")
-        fmt.Println(name)
 				content = []string{}
 			}
 		} else {
