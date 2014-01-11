@@ -3,10 +3,10 @@ package build
 import (
 	"bufio"
 	"bytes"
-	"github.com/jingweno/gotask/task"
 	"io"
 	"regexp"
 	"strings"
+	"github.com/jingweno/gotask/task"
 )
 
 type manPage struct {
@@ -97,25 +97,35 @@ func (p *manPageParser) splitNameAndUsage(nameAndUsage string) (name, usage stri
 
 func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err error) {
 	reader := bufio.NewReader(bytes.NewReader([]byte(optsStr)))
-	flagRegexp := regexp.MustCompile(`\-?\-(\w+),?`)
-
+	flagRegexp := regexp.MustCompile(`\-?\-(\w+),?(=(.+))?`)
 	var (
-		line, name string
-		content    []string
+		isStringFlag    bool
+		stringFlagValue string
+		line, name      string
+		content         []string
 	)
 	for err == nil {
 		line, err = readLine(reader)
 		if flagRegexp.MatchString(line) {
 			if name != line {
 				if name != "" {
-					flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
+					if isStringFlag {
+						flags = append(flags, task.NewStringFlag(name, stringFlagValue, concatFlagContent(content)))
+					} else {
+						flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
+					}
 				}
-
 				var fstrs []string
+				// FIXME: everything is string flag for now
+				// TODO: if it sees `,`, it can predict it's a StringSlice flag
+				isStringFlag = strings.Contains(line, `=`)
+				stringFlagValue = ""
 				for _, fstr := range flagRegexp.FindAllStringSubmatch(line, -1) {
 					fstrs = append(fstrs, fstr[1])
+					if isStringFlag {
+						stringFlagValue = fstr[3]
+					}
 				}
-
 				name = strings.Join(fstrs, ", ")
 				content = []string{}
 			}
@@ -128,7 +138,11 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err err
 	}
 	// the last one
 	if name != "" {
-		flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
+		if isStringFlag {
+			flags = append(flags, task.NewStringFlag(name, stringFlagValue, concatFlagContent(content)))
+		} else {
+			flags = append(flags, task.NewBoolFlag(name, concatFlagContent(content)))
+		}
 	}
 
 	if err == io.EOF {

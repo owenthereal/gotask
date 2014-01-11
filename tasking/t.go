@@ -19,6 +19,11 @@ func (f Flags) Bool(name string) bool {
 	return f.C.Bool(name)
 }
 
+// String looks up the value of a string flag, returns an empty if no string flag exists
+func (f Flags) String(name string) string {
+	return f.C.String(name)
+}
+
 // T is a type that is passed through to each task function.
 // T can be used to retrieve context-specific Args and parsed command-line Flags.
 type T struct {
@@ -40,7 +45,6 @@ func (t *T) Exec(cmd ...string) (err error) {
 	if err != nil {
 		return
 	}
-
 	err = execCmd(input)
 
 	return
@@ -62,13 +66,13 @@ func (t *T) Failed() bool {
 
 // Fatal is equivalent to Error followed by a call to os.Exit(1).
 func (t *T) Fatal(args ...interface{}) {
-	t.Error(args)
+	t.Error(args...)
 	os.Exit(1)
 }
 
 // Fatalf is equivalent to Errorf followed by a call to os.Exit(1).
 func (t *T) Fatalf(format string, args ...interface{}) {
-	t.Errorf(format, args)
+	t.Errorf(format, args...)
 	os.Exit(1)
 }
 
