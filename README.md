@@ -45,6 +45,7 @@ func TaskXxx(t *tasking.T) {
 ```
 
 where `Xxx` can be any alphanumeric string (but the first letter must not be in [a-z]) and serves to identify the task name.
+The task must be defined inside a [GOPATH](http://golang.org/doc/code.html#GOPATH) so that `gotask` can find and compile it.
 
 ### Task Name
 
