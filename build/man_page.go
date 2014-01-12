@@ -3,10 +3,11 @@ package build
 import (
 	"bufio"
 	"bytes"
-	"github.com/jingweno/gotask/task"
 	"io"
 	"regexp"
 	"strings"
+
+	"github.com/jingweno/gotask/task"
 )
 
 type manPage struct {
@@ -123,7 +124,10 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err err
 				for _, fstr := range flagRegexp.FindAllStringSubmatch(line, -1) {
 					fstrs = append(fstrs, fstr[1])
 					if isStringFlag {
-						stringFlagValue = fstr[3]
+						value := fstr[3]
+						if !strings.HasPrefix(value, "<") && !strings.HasSuffix(value, ">") {
+							stringFlagValue = fstr[3]
+						}
 					}
 				}
 				name = strings.Join(fstrs, ", ")

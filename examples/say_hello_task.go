@@ -15,7 +15,7 @@ import (
 //    Print out hello to current user
 //
 // OPTIONS
-//    -n, --name="NAME"
+//    -n, --name=<NAME>
 //        say hello to an user with the given NAME
 //    -v, --verbose
 //        run in verbose mode
