@@ -9,6 +9,7 @@
 //
 // Task Definition
 //
+// A task is defined in the form of
 //     // +build gotask
 //  
 //     package main
