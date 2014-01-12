@@ -43,14 +43,17 @@
 //
 // Flags
 // 
-// Flags are declared in section OPTIONS of the task function comments.
+// Flags are declared in section OPTIONS of the task function man page in the comments.
+// The definition of flags follows the POSIX convention, see
+// http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html.
+//
 // For bool flag, the format is
 //     -SHORT-NAME, --LONG-NAME
 //         DESCRIPTION 
 // For string flag, the format is
 //     -SHORT-NAME, --LONG-NAME=<VALUE>
 //         DESCRIPTION
-// If the string flag has a default value, remove the enclosing "<" and ">" like:
+// If the string flag has a default value, remove the enclosing "<" and ">":
 //     -SHORT-NAME, --LONG-NAME=VALUE
 //         DESCRIPTION
 package tasking
