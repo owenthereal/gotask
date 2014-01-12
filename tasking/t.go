@@ -19,7 +19,7 @@ func (f Flags) Bool(name string) bool {
 	return f.C.Bool(name)
 }
 
-// String looks up the value of a string flag, returns an empty if no string flag exists
+// String looks up the value of a string flag, returns "" if no string flag exists
 func (f Flags) String(name string) string {
 	return f.C.String(name)
 }
