@@ -55,3 +55,19 @@ func (f BoolFlag) DefType(importAsPkg string) string {
 func NewBoolFlag(name, usage string) BoolFlag {
 	return BoolFlag{cli.BoolFlag{Name: name, Usage: usage}}
 }
+
+type StringFlag struct {
+	cli.StringFlag
+}
+
+func (f StringFlag) getName() string {
+	return f.Name
+}
+
+func (f StringFlag) DefType(importAsPkg string) string {
+	return fmt.Sprintf(`%s.NewStringFlag("%s", "%s", "%s")`, importAsPkg, f.Name, f.Value, f.Usage)
+}
+
+func NewStringFlag(name, value, usage string) StringFlag {
+	return StringFlag{cli.StringFlag{Name: name, Value: value, Usage: usage}}
+}
