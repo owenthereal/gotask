@@ -44,7 +44,7 @@
 // Flags
 // 
 // Flags are declared in section OPTIONS of the task function man page in the comments.
-// The definition of flags follows the POSIX convention, see
+// The definition of flags should follow the POSIX convention, see
 // http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html.
 //
 // For bool flag, the format is
