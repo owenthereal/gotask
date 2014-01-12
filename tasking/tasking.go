@@ -56,4 +56,6 @@
 // If the string flag has a default value, remove the enclosing "<" and ">":
 //     -SHORT-NAME, --LONG-NAME=VALUE
 //         DESCRIPTION
+//
+// See https://github.com/jingweno/gotask/tree/master/examples for examples.
 package tasking
