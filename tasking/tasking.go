@@ -4,7 +4,7 @@
 //     func TaskXxx(*tasking.T)
 // where Xxx can be any alphanumeric string (but the first letter must not
 // be in [a-z]) and serves to identify the task name.
-// These TestXxx routines must be declared inside a GOPATH so that gotask can 
+// These TestXxx functions must be declared inside a GOPATH so that gotask can 
 // find and compile it.
 //
 // Task Definition
