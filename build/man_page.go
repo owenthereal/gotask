@@ -3,10 +3,10 @@ package build
 import (
 	"bufio"
 	"bytes"
+	"github.com/jingweno/gotask/task"
 	"io"
 	"regexp"
 	"strings"
-	"github.com/jingweno/gotask/task"
 )
 
 type manPage struct {
@@ -116,8 +116,8 @@ func (p *manPageParser) parseOptions(optsStr string) (flags []task.Flag, err err
 					}
 				}
 				var fstrs []string
-				// FIXME: everything is string flag for now
-				// TODO: if it sees `,`, it can predict it's a StringSlice flag
+				// FIXME: everything is a string flag for now
+				// TODO: if it sees `,`, it parses as a StringSlice flag
 				isStringFlag = strings.Contains(line, `=`)
 				stringFlagValue = ""
 				for _, fstr := range flagRegexp.FindAllStringSubmatch(line, -1) {

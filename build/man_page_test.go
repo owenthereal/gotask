@@ -15,7 +15,7 @@ DESCRIPTION
     one more line
 
 OPTIONS
-    -n, --name=[NAME]
+    -n, --name=NAME
         Say hello to the given name
     -v, --verbose
         Run in verbose mode
@@ -34,7 +34,7 @@ OPTIONS
 	stringFlag, ok := mp.Flags[0].(task.StringFlag)
 	assert.Tf(t, ok, "Can't convert flag to task.StringFlag")
 	assert.Equal(t, "n, name", stringFlag.Name)
-	assert.Equal(t, "", stringFlag.Value)
+	assert.Equal(t, "NAME", stringFlag.Value)
 	assert.Equal(t, "Say hello to the given name", stringFlag.Usage)
 
 	boolFlag, ok := mp.Flags[1].(task.BoolFlag)
